@@ -89,7 +89,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PhluffyShuffyWebData\ProductData.csproj">
+    <ProjectReference Include="..\ProductData\ProductData.csproj">
       <Project>{181f1c24-9924-4a4f-b599-09d7093640e1}</Project>
       <Name>ProductData</Name>
     </ProjectReference>
