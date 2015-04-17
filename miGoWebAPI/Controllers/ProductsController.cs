@@ -23,7 +23,7 @@ namespace miGoWebAPI.Controllers
         {
             if (productStorage == null)
             {
-                throw new ArgumentNullException("imageStorage");
+                throw new ArgumentNullException("productStorage");
             }
 
             this.storage = productStorage;

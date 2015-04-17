@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhluffyShuffyImageProcessor", ProductFetcher\PhluffyShuffyImageProcessor.csproj", "{24CC0730-B11E-4685-A9A8-D4493C511C6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductFetcher", "ProductFetcher\ProductFetcher.csproj", "{24CC0730-B11E-4685-A9A8-D4493C511C6F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "miGoWebAPI", "miGoWebAPI\miGoWebAPI.csproj", "{32F8D8C2-6E3E-4EFD-AC66-CCD71D5400D5}"
 EndProject

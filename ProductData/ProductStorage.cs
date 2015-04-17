@@ -43,7 +43,6 @@ namespace ProductData
             CloudTable table = tableClient.GetTableReference("Products");
 
             var results = (from entity in table.CreateQuery<Product>()
-                           //where entity.PartitionKey == "奥特莱"
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -54,7 +53,7 @@ namespace ProductData
             CloudTable table = tableClient.GetTableReference("Products");
 
             var results = (from entity in table.CreateQuery<Product>()
-                           where string.Compare(entity.PartitionKey, storeName, true) ==0
+                           where string.Compare(entity.Store, storeName, true) ==0
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -120,6 +119,56 @@ namespace ProductData
                 table.Execute(deleteOperation); 
         }
 
+        }
+    }
+
+    public class ProductUrlStorage : IProductUrlStorage
+    {
+        private readonly CloudStorageAccount storageAccount;
+        private readonly CloudTableClient tableClient;
+        private readonly CloudBlobClient blobClient;
+        private readonly CloudQueueClient queueClient;
+
+
+        public ProductUrlStorage(string connectionString)
+            : this(CloudStorageAccount.Parse(connectionString))
+        {
+        }
+
+        public ProductUrlStorage(CloudStorageAccount storageAccount)
+        {
+            this.storageAccount = storageAccount;
+            this.tableClient = storageAccount.CreateCloudTableClient();
+            this.blobClient = this.storageAccount.CreateCloudBlobClient();
+            this.queueClient = this.storageAccount.CreateCloudQueueClient();
+        }
+
+
+        public IEnumerable<ProductURL> GetAllProductUrls(bool active = true)
+        {
+            CloudTable table = tableClient.GetTableReference("ProductUrls");
+
+            var results = from entity in table.CreateQuery<ProductURL>()
+                          select entity;
+
+            if (active)
+                results = results.Where(o => o.IsActive == true);
+
+            return new List<ProductURL>(results);
+        }
+
+        public IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true)
+        {
+            CloudTable table = tableClient.GetTableReference("URL");
+
+            var results = from entity in table.CreateQuery<ProductURL>()
+                          where string.Compare(entity.StoreName, storeName, true) == 0
+                          select entity;
+
+            if (active)
+                results = results.Where(o => o.IsActive == true);
+
+            return new List<ProductURL>(results);
         }
     }
 }

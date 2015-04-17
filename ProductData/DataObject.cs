@@ -39,29 +39,47 @@ namespace ProductData
 
     }
 
+    public interface IProductUrlStorage
+    {
+        IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
+        IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
+    }
+
     public enum Category
     {
-        Health,
         [Display(Name = "Health Care")]
-        Beauty,
+        Health,
         [Display(Name = "Beauty")]
-        Electronics
+        Beauty,
+        [Display(Name = "Cloth")]
+        Cloth
     }
 
     public class Product : TableEntity
     {
         public Guid ProductId { get; set; }
 
-        [StringLength(100)]
+        [StringLength(500)]
         public string ProductName { get; set; }
-        
+
+        [StringLength(100)]
+        public string Store { get; set; }
+
+
         [StringLength(100)]
         public string ProductSKU { get; set; }
+
+        [StringLength(8000)]
+        public string ProductURL { get; set; }
+
+        [StringLength(8000)]
+        public string ProductImage { get; set; }
         
+
         [StringLength(1000)]
         [DataType(DataType.MultilineText)]
         public string ProductDescription { get; set; }
-        public Category? Category { get; set; }
+        public Category Category { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -94,12 +112,27 @@ namespace ProductData
         [StringLength(100)]
         public string StoreName { get; set; }
 
+        // Zipcode?
         [StringLength(100)]
-        public string ProductSKU { get; set; }
+        public string Zipcode { get; set; }
 
         [StringLength(1000)]
         [DataType(DataType.MultilineText)]
         public string StoreDescription { get; set; }
+
+        public Boolean? IsActive { get; set; }
+    }
+
+    public class ProductURL : TableEntity
+    {
+        [StringLength(100)]
+        public string StoreName { get; set; }
+
+        [StringLength(100)]
+        public string Category { get; set; }
+
+        [StringLength(100)]
+        public string ProductUrl { get; set; }
 
         public Boolean? IsActive { get; set; }
     }
