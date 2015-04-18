@@ -44,6 +44,8 @@ namespace ProductData
     {
         IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
         IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
+
+        void AddProductUrl(ProductURL purl);
     }
 
     public enum Category
@@ -116,24 +118,24 @@ namespace ProductData
         [StringLength(100)]
         [DefaultValue("test")]
         public string SaleCity { get; set; }
-    }
 
-    public class Store
-    {
-        public Guid StoreId { get; set; }
+        public string GetRowKey()
+        {
+            return Utilities.CalculateMD5Hash(string.Concat(
+                this.Category, 
+                this.CouponDetail, 
+                this.CouponStartDate, 
+                this.CouponEndDate,
+                this.ProductId, 
+                this.ProductName, 
+                //this.ProductSKU, 
+                this.OriginalPrice, 
+                this.SalePrice,
+                this.Store
+                ));
 
-        [StringLength(100)]
-        public string StoreName { get; set; }
+        }
 
-        // Zipcode?
-        [StringLength(100)]
-        public string Zipcode { get; set; }
-
-        [StringLength(1000)]
-        [DataType(DataType.MultilineText)]
-        public string StoreDescription { get; set; }
-
-        public Boolean? IsActive { get; set; }
     }
 
     public class ProductURL : TableEntity
@@ -147,6 +149,17 @@ namespace ProductData
         [StringLength(100)]
         public string ProductUrl { get; set; }
 
+        [StringLength(100)]
+        public string Zipcode { get; set; }
+
+        [StringLength(100)]
+        public string StoreChain { get; set; }
         public Boolean? IsActive { get; set; }
+
+        public string GetRowKey()
+        {
+            return Utilities.CalculateMD5Hash(string.Concat(this.StoreName, this.Category, this.ProductUrl, this.Zipcode));
+            
+        }
     }
 }

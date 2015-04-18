@@ -35,7 +35,7 @@ namespace ProductFetcher
             IEnumerable<ProductURL> urls = GetProductUrls();
             foreach (ProductURL u in urls)
             {
-                switch (u.StoreName)
+                switch (u.StoreChain)
                 {
                     case "Costco":
                         CostcoFetcher(u);
@@ -43,7 +43,7 @@ namespace ProductFetcher
                     case "Macys":
                         MacysFetcher(u);
                         break;
-                    case "Outlets":
+                    case "Premium Outlets":
                         OutletFetcher(u);
                         break;
                     default:

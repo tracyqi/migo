@@ -43,7 +43,7 @@ namespace ProductData
 
         public void AddProduct(Product p)
         {
-            p.RowKey = p.GetHashCode().ToString();
+            p.RowKey = p.GetRowKey().ToString();
             p.PartitionKey = p.Store;
             p.ProductId = Guid.NewGuid();
 
@@ -172,6 +172,16 @@ namespace ProductData
                 results = results.Where(o => o.IsActive == true);
 
             return new List<ProductURL>(results);
+        }
+
+
+        public void AddProductUrl(ProductURL purl)
+        {
+            purl.RowKey = purl.GetRowKey().ToString();
+            purl.PartitionKey = purl.StoreName;
+
+            TableOperation insertOperation = TableOperation.InsertOrReplace(purl);
+            table.Execute(insertOperation);
         }
     }
 }

@@ -5,6 +5,7 @@ using ProductData;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 
 namespace ProductFetcher
 {
@@ -30,59 +31,31 @@ namespace ProductFetcher
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(conn);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
 
-            // Create the table if it doesn't exist. 
             CloudTable table = tableClient.GetTableReference("ProductUrls");
             table.CreateIfNotExists();
 
-            ProductURL p = new ProductURL();
-            p.Category = Category.Health.ToString();
-            p.StoreName = "Costco";
-            p.ProductUrl = "http://www.costco.com/adult-multi-letter-vitamins.html?pageSize=96";
-            p.IsActive = true;
-            p.PartitionKey = p.StoreName;
-            p.RowKey = Guid.NewGuid().ToString();
+            string fileName = Path.Combine(Environment.CurrentDirectory, "ProductUrls.csv");
 
-            TableOperation insertOperation = TableOperation.Insert(p);
-            // Execute the insert operation. 
-            table.Execute(insertOperation);
+            String[] values = File.ReadAllText(fileName).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
+            foreach(string s in values)
+            {
+                if (!string.IsNullOrEmpty(s.Trim()))
+                {
+                    string[] columns = s.Split('\t');
 
-            p = new ProductURL();
-            p.Category = Category.Cosmetology.ToString();
-            p.StoreName = "Costco";
-            p.ProductUrl = "http://www.costco.com/skin-care.html?pageSize=96";
-            p.IsActive = true;
-            p.PartitionKey = p.StoreName;
-            p.RowKey = Guid.NewGuid().ToString();
+                    ProductURL p = new ProductURL();
+                    p.StoreChain = columns[0];
+                    p.StoreName = columns[1];
+                    p.Category = columns[2];
+                    p.ProductUrl = columns[3];
+                    if (columns.Length >4)
+                        p.Zipcode = columns[4]; 
+                    p.IsActive = true;
 
-            insertOperation = TableOperation.Insert(p);
-            // Execute the insert operation. 
-            table.Execute(insertOperation);
-
-            p = new ProductURL();
-            p.Category = Category.Cosmetology.ToString();
-            p.StoreName = "Macys";
-            p.ProductUrl = "http://www1.macys.com/shop/makeup-and-perfume/gift-sets?id=55537&edge=hybrid";
-            p.IsActive = true;
-            p.PartitionKey = p.StoreName;
-            p.RowKey = Guid.NewGuid().ToString();
-
-            insertOperation = TableOperation.Insert(p);
-            // Execute the insert operation. 
-            table.Execute(insertOperation);
-
-            p = new ProductURL();
-            p.Category = Category.Cloth.ToString();
-            p.StoreName = "Outlets";
-            p.ProductUrl = "http://www.premiumoutlets.com/outlets/sales.asp?id=110";
-            p.IsActive = true;
-            p.PartitionKey = p.StoreName;
-            p.RowKey = Guid.NewGuid().ToString();
-
-            insertOperation = TableOperation.Insert(p);
-            // Execute the insert operation. 
-            table.Execute(insertOperation);
-
+                    productUrlStorage.AddProductUrl(p);
+                }
+            }
         }
     }
 }
