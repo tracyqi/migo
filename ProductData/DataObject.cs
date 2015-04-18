@@ -36,6 +36,7 @@ namespace ProductData
         IEnumerable<Product> GetProductsByCategory(Category category);
         IEnumerable<Product> GetProductsExpired();
         void Delete(IEnumerable<Product> products);
+        void AddProduct(Product p);
 
     }
 
@@ -60,48 +61,60 @@ namespace ProductData
         public Guid ProductId { get; set; }
 
         [StringLength(500)]
+        [DefaultValue("test")]
         public string ProductName { get; set; }
 
         [StringLength(100)]
+        [DefaultValue("test")]
         public string Store { get; set; }
 
 
         [StringLength(100)]
+        [DefaultValue("test")]
         public string ProductSKU { get; set; }
 
         [StringLength(8000)]
+        [DefaultValue("test")]
         public string ProductURL { get; set; }
 
         [StringLength(8000)]
+        [DefaultValue("test")]
         public string ProductImage { get; set; }
         
 
         [StringLength(1000)]
         [DataType(DataType.MultilineText)]
+        [DefaultValue("test")]
         public string ProductDescription { get; set; }
-        public Category Category { get; set; }
+        public string Category { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime CouponStartDate { get; set; }
 
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [DefaultValue("01/10/2001")]
+        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime CouponEndDate { get; set; }
 
         [StringLength(1000)]
+        [DefaultValue("test")]
         [DataType(DataType.MultilineText)]
         public string CouponDetail { get; set; }
 
         [StringLength(2083)]
         [DisplayName("Full-size Image")]
+        [DefaultValue("test")]
         public string CouponImage { get; set; }
 
+        [DefaultValue(0.0)]
         public Double OriginalPrice { get; set; }
+        [DefaultValue(0.0)]
         public Double SalePrice { get; set; }
 
         [StringLength(100)]
+        [DefaultValue("test")]
         public string SaleCity { get; set; }
     }
 

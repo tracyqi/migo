@@ -15,7 +15,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ProductData
 {
- 
+
     public class ProductStorage : IProductStorage
     {
 
@@ -23,6 +23,7 @@ namespace ProductData
         private readonly CloudTableClient tableClient;
         private readonly CloudBlobClient blobClient;
         private readonly CloudQueueClient queueClient;
+        private readonly CloudTable table;
 
 
         public ProductStorage(string connectionString)
@@ -36,12 +37,22 @@ namespace ProductData
             this.tableClient = storageAccount.CreateCloudTableClient();
             this.blobClient = this.storageAccount.CreateCloudBlobClient();
             this.queueClient = this.storageAccount.CreateCloudQueueClient();
+            this.table = tableClient.GetTableReference("productsen");
+            table.CreateIfNotExistsAsync();
         }
 
+        public void AddProduct(Product p)
+        {
+            p.RowKey = p.GetHashCode().ToString();
+            p.PartitionKey = p.Store;
+            p.ProductId = Guid.NewGuid();
+
+            TableOperation insertOperation = TableOperation.InsertOrReplace(p);
+            table.Execute(insertOperation);
+
+        }
         public IEnumerable<Product> GetAllProducts()
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = (from entity in table.CreateQuery<Product>()
                            select entity).Take(100).ToList();
 
@@ -50,10 +61,8 @@ namespace ProductData
 
         public IEnumerable<Product> GetAllProductsByStore(string storeName)
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = (from entity in table.CreateQuery<Product>()
-                           where string.Compare(entity.Store, storeName, true) ==0
+                           where string.Compare(entity.Store, storeName, true) == 0
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -61,8 +70,6 @@ namespace ProductData
 
         public IEnumerable<Product> GetProductsByName(string productName)
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = from entity in table.CreateQuery<Product>()
                           where string.Compare(entity.ProductName, productName, true) == 0
                           select entity;
@@ -72,21 +79,17 @@ namespace ProductData
 
         public Product GetProductsById(Guid id)
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = from entity in table.CreateQuery<Product>()
-                           where entity.ProductId== id
-                           select entity;
+                          where entity.ProductId == id
+                          select entity;
 
             return results.First();
         }
 
         public IEnumerable<Product> GetProductsByCategory(Category category)
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = (from entity in table.CreateQuery<Product>()
-                           where entity.Category == category
+                           where entity.Category == category.ToString()
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -95,10 +98,8 @@ namespace ProductData
 
         public IEnumerable<Product> GetProductsExpired()
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             var results = (from entity in table.CreateQuery<Product>()
-                           where entity.CouponEndDate  <= DateTime.Now
+                           where entity.CouponEndDate <= DateTime.Now
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -106,18 +107,16 @@ namespace ProductData
 
         public void Delete(IEnumerable<Product> products)
         {
-            CloudTable table = tableClient.GetTableReference("Products");
-
             foreach (var r in products)
             {
                 var results = (from entity in table.CreateQuery<Product>()
                                where entity.ProductId == r.ProductId
                                select entity).Take(100).ToList();
 
-                TableOperation deleteOperation = TableOperation.Delete(r); 
+                TableOperation deleteOperation = TableOperation.Delete(r);
                 // Execute the operation. 
-                table.Execute(deleteOperation); 
-        }
+                table.Execute(deleteOperation);
+            }
 
         }
     }
@@ -128,7 +127,7 @@ namespace ProductData
         private readonly CloudTableClient tableClient;
         private readonly CloudBlobClient blobClient;
         private readonly CloudQueueClient queueClient;
-
+        private readonly CloudTable table;
 
         public ProductUrlStorage(string connectionString)
             : this(CloudStorageAccount.Parse(connectionString))
@@ -141,13 +140,12 @@ namespace ProductData
             this.tableClient = storageAccount.CreateCloudTableClient();
             this.blobClient = this.storageAccount.CreateCloudBlobClient();
             this.queueClient = this.storageAccount.CreateCloudQueueClient();
+            this.table = tableClient.GetTableReference("ProductUrls");
         }
 
 
         public IEnumerable<ProductURL> GetAllProductUrls(bool active = true)
         {
-            CloudTable table = tableClient.GetTableReference("ProductUrls");
-
             var results = from entity in table.CreateQuery<ProductURL>()
                           select entity;
 
@@ -159,8 +157,6 @@ namespace ProductData
 
         public IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true)
         {
-            CloudTable table = tableClient.GetTableReference("URL");
-
             var results = from entity in table.CreateQuery<ProductURL>()
                           where string.Compare(entity.StoreName, storeName, true) == 0
                           select entity;

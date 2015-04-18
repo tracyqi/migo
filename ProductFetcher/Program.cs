@@ -48,7 +48,7 @@ namespace ProductFetcher
 
             p = new ProductURL();
             p.Category = Category.Beauty.ToString();
-            p.StoreName = "Costo";
+            p.StoreName = "Costco";
             p.ProductUrl = "http://www.costco.com/skin-care.html?pageSize=96";
             p.IsActive = true;
             p.PartitionKey = p.StoreName;
