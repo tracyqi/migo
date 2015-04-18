@@ -22,6 +22,7 @@ namespace ProductFetcher
         }
 
         // This is a temporary function to generate producturl table
+        // This is not suppose to be run all the time. 
         private static void GenerateProductUrlsTable()
         {
             string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
