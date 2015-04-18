@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductData", "ProductData\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductCleanup", "ProductCleanup\ProductCleanup.csproj", "{78B1E533-FC80-4FA7-881F-E34FB6ECAE80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductTranslater", "ProductTranslater\ProductTranslater.csproj", "{30162934-EE93-420B-8271-BEB560407501}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,12 @@ Global
 		{78B1E533-FC80-4FA7-881F-E34FB6ECAE80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78B1E533-FC80-4FA7-881F-E34FB6ECAE80}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78B1E533-FC80-4FA7-881F-E34FB6ECAE80}.Release|x86.ActiveCfg = Release|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30162934-EE93-420B-8271-BEB560407501}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,7 +27,7 @@ namespace ProductCleanup
         [NoAutomaticTrigger()]
         public static void CleanupFunction(CloudStorageAccount storageAccount, TextWriter log)
         {
-            Cleanup cleanupClass = new Cleanup(new ProductStorage(storageAccount));
+            Cleanup cleanupClass = new Cleanup(new ProductStorage(storageAccount, "producten"));
             cleanupClass.DoCleanup(log);
         }
 

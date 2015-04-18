@@ -15,7 +15,7 @@ namespace miGoWebAPI.Controllers
         private readonly IProductStorage storage;
 
         public ProductsController()
-            : this(new ProductStorage(ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString))
+            : this(new ProductStorage(ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString, "Products"))
         {
         }
 
@@ -56,7 +56,7 @@ namespace miGoWebAPI.Controllers
         [Route("{category}")]
         public IEnumerable<Product> GetProductsByCategory(string category)
         {
-            Category c = Category.Beauty;
+            Category c = Category.Cosmetology;
 
             Enum.TryParse<Category>(category, out c);
             return this.storage.GetProductsByCategory(c);

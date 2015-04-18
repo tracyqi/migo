@@ -32,7 +32,7 @@ namespace ProductFetcher
 
             // Create the table if it doesn't exist. 
             CloudTable table = tableClient.GetTableReference("ProductUrls");
-            table.CreateIfNotExistsAsync();
+            table.CreateIfNotExists();
 
             ProductURL p = new ProductURL();
             p.Category = Category.Health.ToString();
@@ -48,7 +48,7 @@ namespace ProductFetcher
 
 
             p = new ProductURL();
-            p.Category = Category.Beauty.ToString();
+            p.Category = Category.Cosmetology.ToString();
             p.StoreName = "Costco";
             p.ProductUrl = "http://www.costco.com/skin-care.html?pageSize=96";
             p.IsActive = true;
@@ -60,7 +60,7 @@ namespace ProductFetcher
             table.Execute(insertOperation);
 
             p = new ProductURL();
-            p.Category = Category.Beauty.ToString();
+            p.Category = Category.Cosmetology.ToString();
             p.StoreName = "Macys";
             p.ProductUrl = "http://www1.macys.com/shop/makeup-and-perfume/gift-sets?id=55537&edge=hybrid";
             p.IsActive = true;

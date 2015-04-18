@@ -21,23 +21,23 @@ namespace ProductData
 
         private readonly CloudStorageAccount storageAccount;
         private readonly CloudTableClient tableClient;
-        private readonly CloudBlobClient blobClient;
-        private readonly CloudQueueClient queueClient;
         private readonly CloudTable table;
+        private readonly CloudQueue queue;
 
 
-        public ProductStorage(string connectionString)
-            : this(CloudStorageAccount.Parse(connectionString))
+
+        public ProductStorage(string connectionString, string tableName)
+            : this(CloudStorageAccount.Parse(connectionString), tableName)
         {
         }
 
-        public ProductStorage(CloudStorageAccount storageAccount)
+        public ProductStorage(CloudStorageAccount storageAccount, string tableName)
         {
             this.storageAccount = storageAccount;
             this.tableClient = storageAccount.CreateCloudTableClient();
-            this.blobClient = this.storageAccount.CreateCloudBlobClient();
-            this.queueClient = this.storageAccount.CreateCloudQueueClient();
-            this.table = tableClient.GetTableReference("productsen");
+            this.table = tableClient.GetTableReference(tableName);
+            this.queue = storageAccount.CreateCloudQueueClient().GetQueueReference("workerqueue");
+            queue.CreateIfNotExistsAsync();
             table.CreateIfNotExistsAsync();
         }
 
@@ -50,6 +50,8 @@ namespace ProductData
             TableOperation insertOperation = TableOperation.InsertOrReplace(p);
             table.Execute(insertOperation);
 
+            CloudQueueMessage cloudQueueMessage = new CloudQueueMessage(p.PartitionKey + "," + p.RowKey);
+            queue.AddMessage(cloudQueueMessage);
         }
         public IEnumerable<Product> GetAllProducts()
         {
@@ -81,6 +83,15 @@ namespace ProductData
         {
             var results = from entity in table.CreateQuery<Product>()
                           where entity.ProductId == id
+                          select entity;
+
+            return results.First();
+        }
+
+        public Product GetProductsByKeys(string primaryKey, string rowKey)
+        {
+            var results = from entity in table.CreateQuery<Product>()
+                          where entity.PartitionKey == primaryKey && entity.RowKey == rowKey 
                           select entity;
 
             return results.First();
@@ -125,8 +136,6 @@ namespace ProductData
     {
         private readonly CloudStorageAccount storageAccount;
         private readonly CloudTableClient tableClient;
-        private readonly CloudBlobClient blobClient;
-        private readonly CloudQueueClient queueClient;
         private readonly CloudTable table;
 
         public ProductUrlStorage(string connectionString)
@@ -138,8 +147,6 @@ namespace ProductData
         {
             this.storageAccount = storageAccount;
             this.tableClient = storageAccount.CreateCloudTableClient();
-            this.blobClient = this.storageAccount.CreateCloudBlobClient();
-            this.queueClient = this.storageAccount.CreateCloudQueueClient();
             this.table = tableClient.GetTableReference("ProductUrls");
         }
 

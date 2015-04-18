@@ -37,7 +37,7 @@ namespace ProductData
         IEnumerable<Product> GetProductsExpired();
         void Delete(IEnumerable<Product> products);
         void AddProduct(Product p);
-
+        Product GetProductsByKeys(string primaryKey, string rowKey);
     }
 
     public interface IProductUrlStorage
@@ -50,8 +50,8 @@ namespace ProductData
     {
         [Display(Name = "Health Care")]
         Health,
-        [Display(Name = "Beauty")]
-        Beauty,
+        [Display(Name = "Beauty Prodcut")]
+        Cosmetology,
         [Display(Name = "Cloth")]
         Cloth
     }
