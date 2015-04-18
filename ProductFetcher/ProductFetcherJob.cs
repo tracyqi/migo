@@ -128,7 +128,7 @@ namespace ProductFetcher
                 //Enum.TryParse<Category>(productUrl.Category, out c);
                 product.Category = productUrl.Category;
 
-                HtmlNode node = p.SelectSingleNode("//*[contains(@class,'product-tile-image-container ')]");
+                HtmlNode node =p.SelectSingleNode("div[contains(@class,'product-tile-image-container ')]");
 
                 product.ProductURL = node.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
                 product.ProductSKU = p.Attributes["itemid"].Value;
