@@ -61,5 +61,16 @@ namespace ProductTranslater
 
             return result.InnerText;
         }
+
+        public static string TranslateCategory(string input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static string TranslateProduct(string input)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
