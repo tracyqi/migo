@@ -70,6 +70,14 @@ namespace ProductData
         [DefaultValue("test")]
         public string Store { get; set; }
 
+        [StringLength(100)]
+        [DefaultValue("test")]
+        public string StoreChain { get; set; }
+
+        [StringLength(100)]
+        [DefaultValue("test")]
+        public string Zipcode { get; set; }
+
 
         [StringLength(100)]
         [DefaultValue("test")]

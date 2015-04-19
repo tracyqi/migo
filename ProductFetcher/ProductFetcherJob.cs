@@ -75,7 +75,8 @@ namespace ProductFetcher
                 try
                 {
                     Product product = new Product();
-                    product.Store = productUrl.StoreName;
+                    product.StoreChain = productUrl.StoreName;
+                    product.Zipcode = productUrl.Zipcode;
                     product.Category = productUrl.Category;
 
                     var coupon = x.Replace("<h4 class='cap mb-10'>", "").Replace("</h4>", "").Replace("<br>", "");
@@ -123,6 +124,8 @@ namespace ProductFetcher
                 { 
                 Product product = new Product();
                 product.Store = productUrl.StoreName;
+                product.StoreChain = productUrl.StoreName;
+                product.Zipcode = productUrl.Zipcode;
 
                 //Category c;
                 //Enum.TryParse<Category>(productUrl.Category, out c);
@@ -190,20 +193,22 @@ namespace ProductFetcher
             var categories = htmlDocument.DocumentNode.
                 SelectSingleNode("//ul[@class = 'thumbnails large-block-grid-4' and @id = 'thumbnails']");
 
-            foreach (var product in categories.SelectNodes(".//div[@class = 'innerWrapper']"))
+            foreach (var p in categories.SelectNodes(".//div[@class = 'innerWrapper']"))
             {
                 try
                 { 
-                Product p = new Product();
+                Product product = new Product();
                 //p.Category = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class = 'currentCategory']").InnerText;
-                p.Store = productUrl.StoreName;
-                p.Category = productUrl.Category;
+                product.Store = productUrl.StoreName;
+                product.Category = productUrl.Category;
+                product.StoreChain = productUrl.StoreName;
+                product.Zipcode = productUrl.Zipcode;
 
-                p.ProductURL = "http://www1.macys.com" + product.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
+                product.ProductURL = "http://www1.macys.com" + p.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
 
                 //<h1 id="productTitle" class="productTitle" itemprop="name">Clinique Cleansing by Clinique for Skin Type 1/2</h1>
 
-                HtmlDocument htmlDocument2 = htmlWeb.Load(p.ProductURL);
+                HtmlDocument htmlDocument2 = htmlWeb.Load(product.ProductURL);
                 string productjson = htmlDocument2.DocumentNode.SelectSingleNode(".//script[@id = 'pdpMainData']").InnerText;
 
                 dynamic dynObj = JsonConvert.DeserializeObject(productjson);
@@ -237,28 +242,28 @@ namespace ProductFetcher
                 //}
                 //}
 
-                p.ProductName = dynObj.productDetail.name; //htmlDocument2.DocumentNode.SelectSingleNode(".//h1[@class = 'productTitle']").InnerText;
-                p.ProductImage = dynObj.productDetail.imageUrl;//htmlDocument2.DocumentNode.SelectSingleNode(".//img").Attributes["data-src"].Value;
-                p.OriginalPrice = dynObj.productDetail.regularPrice;//htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'giftSetValue')]");
-                p.SalePrice = Convert.ToDouble(dynObj.productDetail.salePrice.ToString().Length == 0 ? 0 : dynObj.productDetail.salePrice);// htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'priceSale')]");
-                p.ProductSKU = dynObj.productDetail.id;
+                product.ProductName = dynObj.productDetail.name; //htmlDocument2.DocumentNode.SelectSingleNode(".//h1[@class = 'productTitle']").InnerText;
+                product.ProductImage = dynObj.productDetail.imageUrl;//htmlDocument2.DocumentNode.SelectSingleNode(".//img").Attributes["data-src"].Value;
+                product.OriginalPrice = dynObj.productDetail.regularPrice;//htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'giftSetValue')]");
+                product.SalePrice = Convert.ToDouble(dynObj.productDetail.salePrice.ToString().Length == 0 ? 0 : dynObj.productDetail.salePrice);// htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'priceSale')]");
+                product.ProductSKU = dynObj.productDetail.id;
 
-                HtmlDocument htmlDocument3 = htmlWeb.Load(p.ProductURL);
+                HtmlDocument htmlDocument3 = htmlWeb.Load(product.ProductURL);
 
                 var giftOffers = htmlDocument3.DocumentNode.SelectNodes("//div[(@class = 'giftOfferDetails')]");
                 if (giftOffers != null)
                 {
                     foreach (var x in giftOffers)
                     {
-                        p.CouponDetail += x.SelectSingleNode(".//div[(@class = 'giftOfferDescription')]").InnerText + Environment.NewLine;
+                        product.CouponDetail += x.SelectSingleNode(".//div[(@class = 'giftOfferDescription')]").InnerText + Environment.NewLine;
 
                     }
                 }
 
-                p.CouponStartDate = DateTime.MaxValue;
-                p.CouponEndDate = DateTime.MaxValue;
+                product.CouponStartDate = DateTime.MaxValue;
+                product.CouponEndDate = DateTime.MaxValue;
 
-                productStorage.AddProduct(p);
+                productStorage.AddProduct(product);
                 }
                 catch (Exception e)
                 {
