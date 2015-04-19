@@ -28,7 +28,7 @@ namespace ProductTranslater
             var p = (productStorage_en.GetProductsByKeys(msg.Split(',')[0], msg.Split(',')[1]));
 
             Product p_ch = new Product();
-            p_ch.Category = TranslateText(p.Category);
+            p_ch.Category = p.Category;
             p_ch.CouponDetail = TranslateText(p.CouponDetail);
             p_ch.CouponEndDate = p.CouponEndDate;
             p_ch.CouponImage = p.CouponImage;

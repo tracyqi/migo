@@ -56,7 +56,7 @@ namespace miGoWebAPI.Controllers
         [Route("{category}")]
         public IEnumerable<Product> GetProductsByCategory(string category)
         {
-            Category c = Category.Cosmetology;
+            Category c;
 
             Enum.TryParse<Category>(category, out c);
             return this.storage.GetProductsByCategory(c);
