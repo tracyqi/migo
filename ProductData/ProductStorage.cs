@@ -44,7 +44,7 @@ namespace ProductData
         public void AddProduct(Product p)
         {
             p.RowKey = p.GetRowKey().ToString();
-            p.PartitionKey = p.Store;
+            p.PartitionKey = p.StoreChain;
             p.ProductId = Guid.NewGuid();
 
             TableOperation insertOperation = TableOperation.InsertOrReplace(p);
@@ -74,20 +74,29 @@ namespace ProductData
         {
             IEnumerable<Product> results = null;
 
-            switch (storeChainName.ToLower())
+            /* rule to filter out products
+             Costco: filter out 15% off above (by default)
+             * Maycys: all return
+             * Outlet: all return
+             */
+            switch (storeChainName)
             {
                 case "costco":
-                case "macys":
-                    results = (from entity in table.CreateQuery<Product>()
-                                   where string.Compare(entity.StoreChain, storeChainName, true) == 0
-                                   && entity.SalePrice <= entity.OriginalPrice * (1 - salePercentage)
-                                   select entity).ToList();
+                    //results = (from entity in table.CreateQuery<Product>()
+                    //           where (entity.PartitionKey.ToLower() == "costco"//storeChainName.ToLower()
+                    //           && entity.SalePrice <= 100)//entity.OriginalPrice * (1 - salePercentage))
+                    //           select entity).ToList();
+                    TableQuery<Product> query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
+                    results = table.ExecuteQuery(query).ToList();
+                    results = results.Where(o => o.SalePrice <= o.OriginalPrice * (1 - salePercentage));
                     break;
-                default :
-                    results = (from entity in table.CreateQuery<Product>()
-                                   where string.Compare(entity.StoreChain, storeChainName, true) == 0
-                                   //&& entity.SalePrice <= entity.OriginalPrice * (1 - salePercentage)
-                                   select entity).ToList();
+                default:
+                    //results = (from entity in table.CreateQuery<Product>()
+                    //           where (entity.PartitionKey.ToLower() == "macys") //== storeChainName.ToLower())
+                    //               select entity).ToList();
+
+                    query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
+                    results = table.ExecuteQuery(query).ToList();
                     break;
             }
 
@@ -115,7 +124,7 @@ namespace ProductData
         public Product GetProductsByKeys(string primaryKey, string rowKey)
         {
             var results = from entity in table.CreateQuery<Product>()
-                          where entity.PartitionKey == primaryKey && entity.RowKey == rowKey 
+                          where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
                           select entity;
 
             return results.First();

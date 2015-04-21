@@ -76,12 +76,12 @@ namespace ProductFetcher
                 try
                 {
                     Product product = new Product();
-                    product.StoreChain = productUrl.StoreName;
+                    product.StoreChain = productUrl.StoreName.ToLower();
                     product.Zipcode = productUrl.Zipcode;
                     product.Category = productUrl.Category;
 
                     var coupon = x.Replace("<h4 class='cap mb-10'>", "").Replace("</h4>", "").Replace("<br>", "");
-                    product.Store = coupon.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)[0];
+                    product.Store = coupon.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)[0].ToLower();
                     string couponDate = coupon.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)[1];
                     //TODO: better approch to parse start/end date
                     if (couponDate.Contains("-"))
@@ -125,8 +125,8 @@ namespace ProductFetcher
                 {
 
                     Product product = new Product();
-                    product.Store = productUrl.StoreName;
-                    product.StoreChain = productUrl.StoreName;
+                    product.Store = productUrl.StoreName.ToLower();
+                    product.StoreChain = productUrl.StoreName.ToLower();
                     product.Zipcode = productUrl.Zipcode;
 
                     //Category c;
@@ -201,9 +201,9 @@ namespace ProductFetcher
                 {
                     Product product = new Product();
                     //p.Category = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class = 'currentCategory']").InnerText;
-                    product.Store = productUrl.StoreName;
+                    product.Store = productUrl.StoreName.ToLower();
                     product.Category = productUrl.Category;
-                    product.StoreChain = productUrl.StoreName;
+                    product.StoreChain = productUrl.StoreName.ToLower();
                     product.Zipcode = productUrl.Zipcode;
 
                     product.ProductURL = "http://www1.macys.com" + p.SelectSingleNode(".//a[@href]").Attributes["href"].Value;

@@ -7,7 +7,6 @@ using System.Web.Http.Description;
 
 namespace miGoWebAPI.Controllers
 {
-    [RoutePrefix("api/products")]
     public class ProductsController : ApiController
     {
         // GET: api/Coupon
@@ -29,14 +28,14 @@ namespace miGoWebAPI.Controllers
             this.storage = productStorage;
         }
 
-        [Route("")]
         public IEnumerable<Product> GetProducts()
         {
             return this.storage.GetAllProducts();
         }
 
-        [Route("{storechain}")]
-        public IEnumerable<Product> GetProductsByStoreChain(string storeChainName)
+        [HttpGet]
+        [ActionName("storechain")]
+        public IEnumerable<Product> FindProductsByStorechain(string storeChainName)
         {
             return this.storage.GetProductsByStoreChain(storeChainName);
         }
