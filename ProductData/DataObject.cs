@@ -62,9 +62,24 @@ namespace ProductData
     {
         public Guid ProductId { get; set; }
 
-        [StringLength(500)]
-        [DefaultValue("test")]
-        public string ProductName { get; set; }
+        private byte[] productName;
+        [StringLength(1000)]
+        public string ProductName
+        {
+            get
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                if (productName == null) return string.Empty;
+                else return utf8.GetString(productName);
+            }
+
+            set
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                productName = utf8.GetBytes(value);
+
+            }
+        }
 
         [StringLength(100)]
         [DefaultValue("test")]
@@ -90,12 +105,28 @@ namespace ProductData
         [StringLength(8000)]
         [DefaultValue("test")]
         public string ProductImage { get; set; }
-        
 
+
+        private byte[] productDescription;
         [StringLength(1000)]
         [DataType(DataType.MultilineText)]
         [DefaultValue("test")]
-        public string ProductDescription { get; set; }
+        public string ProductDescription
+        {
+            get
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                if (productDescription == null) return string.Empty;
+                else return utf8.GetString(productDescription);
+            }
+
+            set
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                productDescription = utf8.GetBytes(value);
+
+            }
+        }
         public string Category { get; set; }
 
         [DataType(DataType.Date)]
@@ -111,7 +142,26 @@ namespace ProductData
         [StringLength(1000)]
         [DefaultValue("test")]
         [DataType(DataType.MultilineText)]
-        public string CouponDetail { get; set; }
+        private byte[] couponDetail;
+        [StringLength(1000)]
+        public string CouponDetail
+        {
+            get
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                if (couponDetail == null) return string.Empty;
+                else return utf8.GetString(couponDetail);
+            }
+
+            set
+            {
+                UTF8Encoding utf8 = new UTF8Encoding();
+                couponDetail = utf8.GetBytes(value);
+
+            }
+        }
+
+
 
         [StringLength(2083)]
         [DisplayName("Full-size Image")]
@@ -130,14 +180,14 @@ namespace ProductData
         public string GetRowKey()
         {
             return Utilities.CalculateMD5Hash(string.Concat(
-                this.Category, 
-                this.CouponDetail, 
-                this.CouponStartDate, 
+                this.Category,
+                this.CouponDetail == null ? string.Empty : this.CouponDetail,
+                this.CouponStartDate,
                 this.CouponEndDate,
-                this.ProductId, 
-                this.ProductName, 
+                this.ProductId,
+                this.ProductName == null ? string.Empty : this.ProductName,
                 //this.ProductSKU, 
-                this.OriginalPrice, 
+                this.OriginalPrice,
                 this.SalePrice,
                 this.Store
                 ));
@@ -167,7 +217,7 @@ namespace ProductData
         public string GetRowKey()
         {
             return Utilities.CalculateMD5Hash(string.Concat(this.StoreName, this.Category, this.ProductUrl, this.Zipcode));
-            
+
         }
     }
 }

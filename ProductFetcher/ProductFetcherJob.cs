@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using ProductData;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace ProductFetcher
 {
@@ -15,7 +16,7 @@ namespace ProductFetcher
     {
         private readonly IProductStorage productStorage;
         private readonly IProductUrlStorage productUrlStorage;
-        private readonly ILogger logger; 
+        private readonly ILogger logger;
 
         public ProductFetcherJob()
         {
@@ -107,7 +108,7 @@ namespace ProductFetcher
                 catch (Exception e)
                 {
                     logger.Error("failed one:", e.StackTrace);
-                    continue; 
+                    continue;
                 }
             }
         }
@@ -121,59 +122,60 @@ namespace ProductFetcher
             foreach (var p in products)
             {
                 try
-                { 
-                Product product = new Product();
-                product.Store = productUrl.StoreName;
-                product.StoreChain = productUrl.StoreName;
-                product.Zipcode = productUrl.Zipcode;
-
-                //Category c;
-                //Enum.TryParse<Category>(productUrl.Category, out c);
-                product.Category = productUrl.Category;
-
-                HtmlNode node =p.SelectSingleNode("div[contains(@class,'product-tile-image-container ')]");
-
-                product.ProductURL = node.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
-                product.ProductSKU = p.Attributes["itemid"].Value;
-                product.ProductName = node.SelectSingleNode(".//*[contains(@class,'short-desc')]").InnerText;
-                product.ProductImage = node.SelectSingleNode(".//*[contains(@class,'product-image')]").Attributes["src"].Value;
-                product.ProductDescription = p.SelectSingleNode("//*[contains(@class,'description')]").InnerText;
-
-                HtmlDocument htmlDocument2 = htmlWeb.Load(product.ProductURL);
-                var productDetail = htmlDocument2.DocumentNode.SelectSingleNode("//*[contains(@class,'product-price')]");
-                var productValid = htmlDocument2.DocumentNode.SelectSingleNode("//*[contains(@class,'col2')]");
-
-                var y = productDetail.SelectSingleNode(".//*[contains(@class,'merchandisingText')]");
-
-                if (y != null)
                 {
-                    var validDate = y.InnerText.Split(' ');
-                    product.CouponStartDate = Convert.ToDateTime(validDate[5]);
-                    product.CouponEndDate = Convert.ToDateTime(validDate[7].Replace(".", string.Empty));
-                }
-                else
-                {
-                    product.CouponStartDate = DateTime.MaxValue;
-                    product.CouponEndDate = DateTime.MaxValue;
-                }
 
-                var price = productDetail.SelectSingleNode(".//*[contains(@class,'your-price')]").SelectSingleNode(".//*[contains(@class,'currency')]");
-                if (!string.IsNullOrEmpty(price.InnerText))
-                {
-                    product.SalePrice = Convert.ToDouble(price.InnerText.Replace("$", ""));
-                }
-                price = productDetail.SelectSingleNode(".//*[contains(@class,'online-price hide-div')]").SelectSingleNode(".//*[contains(@class,'currency')]");
-                if (!string.IsNullOrEmpty(price.InnerText))
-                {
-                    product.OriginalPrice = Convert.ToDouble(price.InnerText.Remove('$'));
-                }
-                else
-                {
-                    product.OriginalPrice = product.SalePrice;
-                }
+                    Product product = new Product();
+                    product.Store = productUrl.StoreName;
+                    product.StoreChain = productUrl.StoreName;
+                    product.Zipcode = productUrl.Zipcode;
+
+                    //Category c;
+                    //Enum.TryParse<Category>(productUrl.Category, out c);
+                    product.Category = productUrl.Category;
+
+                    HtmlNode node = p.SelectSingleNode("div[contains(@class,'product-tile-image-container ')]");
+
+                    product.ProductURL = node.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
+                    product.ProductSKU = p.Attributes["itemid"].Value;
+                    product.ProductName = node.SelectSingleNode(".//*[contains(@class,'short-desc')]").InnerText;
+                    product.ProductImage = node.SelectSingleNode(".//*[contains(@class,'product-image')]").Attributes["src"].Value;
+
+                    HtmlDocument htmlDocument2 = htmlWeb.Load(product.ProductURL);
+                    var productDetail = htmlDocument2.DocumentNode.SelectSingleNode("//*[contains(@class,'product-price')]");
+                    var productValid = htmlDocument2.DocumentNode.SelectSingleNode("//*[contains(@class,'col2')]");
+                    product.ProductDescription = htmlDocument2.DocumentNode.SelectSingleNode("//head/meta[contains(@name, 'description')]").Attributes["content"].Value;
+
+                    var y = productDetail.SelectSingleNode(".//*[contains(@class,'merchandisingText')]");
+
+                    if (y != null)
+                    {
+                        var validDate = y.InnerText.Split(' ');
+                        product.CouponStartDate = Convert.ToDateTime(validDate[5]);
+                        product.CouponEndDate = Convert.ToDateTime(validDate[7].Replace(".", string.Empty));
+                    }
+                    else
+                    {
+                        product.CouponStartDate = DateTime.MaxValue;
+                        product.CouponEndDate = DateTime.MaxValue;
+                    }
+
+                    var price = productDetail.SelectSingleNode(".//*[contains(@class,'your-price')]").SelectSingleNode(".//*[contains(@class,'currency')]");
+                    if (!string.IsNullOrEmpty(price.InnerText))
+                    {
+                        product.SalePrice = Convert.ToDouble(price.InnerText.Replace("$", ""));
+                    }
+                    price = productDetail.SelectSingleNode(".//*[contains(@class,'online-price hide-div')]").SelectSingleNode(".//*[contains(@class,'currency')]");
+                    if (!string.IsNullOrEmpty(price.InnerText))
+                    {
+                        product.OriginalPrice = Convert.ToDouble(price.InnerText.Remove('$'));
+                    }
+                    else
+                    {
+                        product.OriginalPrice = product.SalePrice;
+                    }
 
 
-                productStorage.AddProduct(product);
+                    productStorage.AddProduct(product);
                 }
                 catch (Exception e)
                 {
@@ -196,74 +198,74 @@ namespace ProductFetcher
             foreach (var p in categories.SelectNodes(".//div[@class = 'innerWrapper']"))
             {
                 try
-                { 
-                Product product = new Product();
-                //p.Category = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class = 'currentCategory']").InnerText;
-                product.Store = productUrl.StoreName;
-                product.Category = productUrl.Category;
-                product.StoreChain = productUrl.StoreName;
-                product.Zipcode = productUrl.Zipcode;
-
-                product.ProductURL = "http://www1.macys.com" + p.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
-
-                //<h1 id="productTitle" class="productTitle" itemprop="name">Clinique Cleansing by Clinique for Skin Type 1/2</h1>
-
-                HtmlDocument htmlDocument2 = htmlWeb.Load(product.ProductURL);
-                string productjson = htmlDocument2.DocumentNode.SelectSingleNode(".//script[@id = 'pdpMainData']").InnerText;
-
-                dynamic dynObj = JsonConvert.DeserializeObject(productjson);
-
-
-                //{
-                //"initializers": {
-                //"mmlCarouselEnabled": false,
-                //"zTailorFeatureEnabled": true
-                //},
-                //"productDetail": {
-                //"id": "2078520",
-                //"name": "Clinique Cleansing by Clinique for Skin Type 1/2",
-                //"giftCard": false,
-                //"categoryId": "55537",
-                //"custRatings": "",
-                //"parentSku": 2078520,
-                //"inStock": "true",
-                //"regularPrice": "89.5",
-                //"salePrice": "",
-                //"title": "Clinique Cleansing by Clinique for Skin Type 1/2",
-                //"imageUrl": "http://slimages.macys.com/is/image/MCY/products/4/optimized/2694624_fpx.tif",
-                //"isChanel": false,
-                //"isMaster": false,
-                //"ratingPercent": 0,
-                //"showReviews": true,
-                //"showQuestionAnswers": true,
-                //"showOffers": true,
-                //"categoryName": "Beauty - Gifts &amp; Value Sets",
-                //"registryMode": ""
-                //}
-                //}
-
-                product.ProductName = dynObj.productDetail.name; //htmlDocument2.DocumentNode.SelectSingleNode(".//h1[@class = 'productTitle']").InnerText;
-                product.ProductImage = dynObj.productDetail.imageUrl;//htmlDocument2.DocumentNode.SelectSingleNode(".//img").Attributes["data-src"].Value;
-                product.OriginalPrice = dynObj.productDetail.regularPrice;//htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'giftSetValue')]");
-                product.SalePrice = Convert.ToDouble(dynObj.productDetail.salePrice.ToString().Length == 0 ? 0 : dynObj.productDetail.salePrice);// htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'priceSale')]");
-                product.ProductSKU = dynObj.productDetail.id;
-
-                HtmlDocument htmlDocument3 = htmlWeb.Load(product.ProductURL);
-
-                var giftOffers = htmlDocument3.DocumentNode.SelectNodes("//div[(@class = 'giftOfferDetails')]");
-                if (giftOffers != null)
                 {
-                    foreach (var x in giftOffers)
+                    Product product = new Product();
+                    //p.Category = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class = 'currentCategory']").InnerText;
+                    product.Store = productUrl.StoreName;
+                    product.Category = productUrl.Category;
+                    product.StoreChain = productUrl.StoreName;
+                    product.Zipcode = productUrl.Zipcode;
+
+                    product.ProductURL = "http://www1.macys.com" + p.SelectSingleNode(".//a[@href]").Attributes["href"].Value;
+
+                    //<h1 id="productTitle" class="productTitle" itemprop="name">Clinique Cleansing by Clinique for Skin Type 1/2</h1>
+
+                    HtmlDocument htmlDocument2 = htmlWeb.Load(product.ProductURL);
+                    string productjson = htmlDocument2.DocumentNode.SelectSingleNode(".//script[@id = 'pdpMainData']").InnerText;
+
+                    dynamic dynObj = JsonConvert.DeserializeObject(productjson);
+
+
+                    //{
+                    //"initializers": {
+                    //"mmlCarouselEnabled": false,
+                    //"zTailorFeatureEnabled": true
+                    //},
+                    //"productDetail": {
+                    //"id": "2078520",
+                    //"name": "Clinique Cleansing by Clinique for Skin Type 1/2",
+                    //"giftCard": false,
+                    //"categoryId": "55537",
+                    //"custRatings": "",
+                    //"parentSku": 2078520,
+                    //"inStock": "true",
+                    //"regularPrice": "89.5",
+                    //"salePrice": "",
+                    //"title": "Clinique Cleansing by Clinique for Skin Type 1/2",
+                    //"imageUrl": "http://slimages.macys.com/is/image/MCY/products/4/optimized/2694624_fpx.tif",
+                    //"isChanel": false,
+                    //"isMaster": false,
+                    //"ratingPercent": 0,
+                    //"showReviews": true,
+                    //"showQuestionAnswers": true,
+                    //"showOffers": true,
+                    //"categoryName": "Beauty - Gifts &amp; Value Sets",
+                    //"registryMode": ""
+                    //}
+                    //}
+
+                    product.ProductName = dynObj.productDetail.name; //htmlDocument2.DocumentNode.SelectSingleNode(".//h1[@class = 'productTitle']").InnerText;
+                    product.ProductImage = dynObj.productDetail.imageUrl;//htmlDocument2.DocumentNode.SelectSingleNode(".//img").Attributes["data-src"].Value;
+                    product.OriginalPrice = dynObj.productDetail.regularPrice;//htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'giftSetValue')]");
+                    product.SalePrice = Convert.ToDouble(dynObj.productDetail.salePrice.ToString().Length == 0 ? 0 : dynObj.productDetail.salePrice);// htmlDocument2.DocumentNode.SelectSingleNode("//span[(@class = 'priceSale')]");
+                    product.ProductSKU = dynObj.productDetail.id;
+
+                    HtmlDocument htmlDocument3 = htmlWeb.Load(product.ProductURL);
+
+                    var giftOffers = htmlDocument3.DocumentNode.SelectNodes("//div[(@class = 'giftOfferDetails')]");
+                    if (giftOffers != null)
                     {
-                        product.CouponDetail += x.SelectSingleNode(".//div[(@class = 'giftOfferDescription')]").InnerText + Environment.NewLine;
+                        foreach (var x in giftOffers)
+                        {
+                            product.CouponDetail += x.SelectSingleNode(".//div[(@class = 'giftOfferDescription')]").InnerText + Environment.NewLine;
 
+                        }
                     }
-                }
 
-                product.CouponStartDate = DateTime.MaxValue;
-                product.CouponEndDate = DateTime.MaxValue;
+                    product.CouponStartDate = DateTime.MaxValue;
+                    product.CouponEndDate = DateTime.MaxValue;
 
-                productStorage.AddProduct(product);
+                    productStorage.AddProduct(product);
                 }
                 catch (Exception e)
                 {
