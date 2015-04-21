@@ -164,10 +164,12 @@ namespace ProductFetcher
                     {
                         product.SalePrice = Convert.ToDouble(price.InnerText.Replace("$", ""));
                     }
-                    price = productDetail.SelectSingleNode(".//*[contains(@class,'online-price hide-div')]").SelectSingleNode(".//*[contains(@class,'currency')]");
+
+
+                    price = productDetail.SelectSingleNode(".//*[contains(@class,'online-price')]").SelectSingleNode(".//*[contains(@class,'currency')]");
                     if (!string.IsNullOrEmpty(price.InnerText))
                     {
-                        product.OriginalPrice = Convert.ToDouble(price.InnerText.Remove('$'));
+                        product.OriginalPrice = Convert.ToDouble(price.InnerText.Replace("$", ""));
                     }
                     else
                     {

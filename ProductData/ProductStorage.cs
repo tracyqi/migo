@@ -13,10 +13,32 @@ using Microsoft.WindowsAzure.Storage.Queue.Protocol;
 using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Net;
+using System.Threading;
+using Microsoft.WindowsAzure.Storage.Table.Protocol;
 
 namespace ProductData
 {
 
+    public static class StorageExtensions
+    {
+        public static bool SafeCreateIfNotExists(this CloudTable table, TableRequestOptions requestOptions = null, OperationContext operationContext = null)
+        {
+            do
+            {
+                try
+                {
+                    return table.CreateIfNotExists(requestOptions, operationContext);
+                }
+                catch (StorageException e)
+                {
+                    if ((e.RequestInformation.HttpStatusCode == 409) && (e.RequestInformation.ExtendedErrorInformation.ErrorCode.Equals(TableErrorCodeStrings.TableBeingDeleted)))
+                        Thread.Sleep(1000);// The table is currently being deleted. Try again until it works.
+                    else
+                        throw;
+                }
+            } while (true);
+        }
+    }
     public class ProductStorage : IProductStorage
     {
 
@@ -39,7 +61,7 @@ namespace ProductData
             this.table = tableClient.GetTableReference(tableName);
             this.queue = storageAccount.CreateCloudQueueClient().GetQueueReference("workerqueue");
             queue.CreateIfNotExists();
-            table.CreateIfNotExists();
+            table.SafeCreateIfNotExists();
         }
 
         public void AddProduct(Product p)
