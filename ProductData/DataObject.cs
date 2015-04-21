@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ProductData
@@ -115,13 +117,13 @@ namespace ProductData
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
                 if (productDescription == null) return string.Empty;
-                else return utf8.GetString(productDescription);
+                else return utf8.GetString( productDescription);
             }
 
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productDescription = utf8.GetBytes(value);
+                productDescription = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;)", ""));
 
             }
         }
