@@ -40,6 +40,7 @@ namespace miGoWebAPI.Controllers
             return this.storage.GetProductsByStoreChain(storeChainName);
         }
 
+
         public IEnumerable<Product> GetProductsByName(string productName)
         {
             return this.storage.GetProductsByName(productName);

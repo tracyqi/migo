@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Queue.Protocol;
 using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Table;
+using System.Net;
 
 namespace ProductData
 {
@@ -74,6 +75,8 @@ namespace ProductData
         {
             IEnumerable<Product> results = null;
 
+            //storeChainName = WebUtility.HtmlDecode(storeChainName);
+            storeChainName = storeChainName.Replace("20%", " ").ToLower() ;
             /* rule to filter out products
              Costco: filter out 15% off above (by default)
              * Maycys: all return
@@ -97,6 +100,7 @@ namespace ProductData
 
                     query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
                     results = table.ExecuteQuery(query).ToList();
+                    //results = results.Where(o => o.Store == o.OriginalPrice * (1 - salePercentage));
                     break;
             }
 
