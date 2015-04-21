@@ -45,6 +45,7 @@ namespace ProductTranslater
             p_ch.SaleCity = TranslateText(p.SaleCity);
             p_ch.SalePrice = p.SalePrice;
             p_ch.Store = TranslateText(p.Store);
+            p_ch.StoreChain = p.StoreChain;
 
             productStorage_ch.AddProduct(p_ch);
         }

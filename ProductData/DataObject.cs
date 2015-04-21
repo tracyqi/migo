@@ -30,7 +30,8 @@ namespace ProductData
     public interface IProductStorage
     {
         IEnumerable<Product> GetAllProducts();
-        IEnumerable<Product> GetAllProductsByStore(string storeName);
+        IEnumerable<Product> GetProductsByStore(string storeName);
+        IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage=0.15);
         IEnumerable<Product> GetProductsByName(string productName);
         Product GetProductsById(Guid id);
         IEnumerable<Product> GetProductsByCategory(Category category);

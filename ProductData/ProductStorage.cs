@@ -37,8 +37,8 @@ namespace ProductData
             this.tableClient = storageAccount.CreateCloudTableClient();
             this.table = tableClient.GetTableReference(tableName);
             this.queue = storageAccount.CreateCloudQueueClient().GetQueueReference("workerqueue");
-            queue.CreateIfNotExistsAsync();
-            table.CreateIfNotExistsAsync();
+            queue.CreateIfNotExists();
+            table.CreateIfNotExists();
         }
 
         public void AddProduct(Product p)
@@ -61,11 +61,35 @@ namespace ProductData
             return new List<Product>(results);
         }
 
-        public IEnumerable<Product> GetAllProductsByStore(string storeName)
+        public IEnumerable<Product> GetProductsByStore(string storeName)
         {
             var results = (from entity in table.CreateQuery<Product>()
                            where string.Compare(entity.Store, storeName, true) == 0
-                           select entity).Take(100).ToList();
+                           select entity).ToList();
+
+            return new List<Product>(results);
+        }
+
+        public IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage = 0.15)
+        {
+            IEnumerable<Product> results = null;
+
+            switch (storeChainName.ToLower())
+            {
+                case "costco":
+                case "macys":
+                    results = (from entity in table.CreateQuery<Product>()
+                                   where string.Compare(entity.StoreChain, storeChainName, true) == 0
+                                   && entity.SalePrice <= entity.OriginalPrice * (1 - salePercentage)
+                                   select entity).ToList();
+                    break;
+                default :
+                    results = (from entity in table.CreateQuery<Product>()
+                                   where string.Compare(entity.StoreChain, storeChainName, true) == 0
+                                   //&& entity.SalePrice <= entity.OriginalPrice * (1 - salePercentage)
+                                   select entity).ToList();
+                    break;
+            }
 
             return new List<Product>(results);
         }

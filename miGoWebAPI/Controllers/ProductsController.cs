@@ -35,10 +35,10 @@ namespace miGoWebAPI.Controllers
             return this.storage.GetAllProducts();
         }
 
-        [Route("{store}")]
-        public IEnumerable<Product> GetAllProductsByStore(string storeName)
+        [Route("{storechain}")]
+        public IEnumerable<Product> GetProductsByStoreChain(string storeChainName)
         {
-            return this.storage.GetAllProductsByStore(storeName);
+            return this.storage.GetProductsByStoreChain(storeChainName);
         }
 
         public IEnumerable<Product> GetProductsByName(string productName)
