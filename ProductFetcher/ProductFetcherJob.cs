@@ -104,6 +104,7 @@ namespace ProductFetcher
                     product.CouponDetail = string.Join("\n", eventDescription_li.ToArray());
 
                     productStorage.AddProduct(product);
+                    productStorage.AddQueue(product);
                 }
                 catch (Exception e)
                 {
@@ -178,6 +179,8 @@ namespace ProductFetcher
 
 
                     productStorage.AddProduct(product);
+                    productStorage.AddQueue(product);
+
                 }
                 catch (Exception e)
                 {
@@ -268,6 +271,8 @@ namespace ProductFetcher
                     product.CouponEndDate = DateTime.MaxValue;
 
                     productStorage.AddProduct(product);
+                    productStorage.AddQueue(product);
+
                 }
                 catch (Exception e)
                 {

@@ -12,44 +12,7 @@ using System.Threading.Tasks;
 
 namespace ProductData
 {
-    public interface IImageStorage
-    {
-        IEnumerable<string> GetShufflesOlderThan(DateTime date);
 
-        IEnumerable<Uri> GetAllShuffleParts(string shuffleId);
-
-        Uri GetImageLink(string shuffleId);
-
-        bool IsReadonly(string shuffleId);
-
-        void AddNewPart(string shuffleId, string fileName, Stream fileStream);
-
-        void RequestShuffle(string shuffleId);
-
-        void Delete(string shuffleId);
-    }
-
-    public interface IProductStorage
-    {
-        IEnumerable<Product> GetAllProducts();
-        IEnumerable<Product> GetProductsByStore(string storeName);
-        IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage=0.15);
-        IEnumerable<Product> GetProductsByName(string productName);
-        Product GetProductsById(Guid id);
-        IEnumerable<Product> GetProductsByCategory(Category category);
-        IEnumerable<Product> GetProductsExpired();
-        void Delete(IEnumerable<Product> products);
-        void AddProduct(Product p);
-        Product GetProductsByKeys(string primaryKey, string rowKey);
-    }
-
-    public interface IProductUrlStorage
-    {
-        IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
-        IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
-
-        void AddProductUrl(ProductURL purl);
-    }
 
     public enum Category
     {
