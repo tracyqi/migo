@@ -42,7 +42,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productName = utf8.GetBytes(value);
+                productName = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
 
             }
         }
@@ -86,7 +86,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productDescription = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;)", ""));
+                productDescription = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
 
             }
         }
@@ -119,7 +119,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                couponDetail = utf8.GetBytes(value);
+                couponDetail = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
 
             }
         }
@@ -147,7 +147,7 @@ namespace ProductData
                 this.CouponDetail == null ? string.Empty : this.CouponDetail,
                 this.CouponStartDate,
                 this.CouponEndDate,
-                this.ProductId,
+                //this.ProductId,
                 this.ProductName == null ? string.Empty : this.ProductName,
                 //this.ProductSKU, 
                 this.OriginalPrice,

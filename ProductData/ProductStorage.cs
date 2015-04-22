@@ -46,7 +46,7 @@ namespace ProductData
         IEnumerable<Product> GetProductsByCategory(Category category);
         IEnumerable<Product> GetProductsExpired();
         void Delete(IEnumerable<Product> products);
-        void AddProduct(Product p);
+        bool AddProduct(Product p);
         Product GetProductByKeys(string primaryKey, string rowKey);
         void AddQueue(Product p);
     }
@@ -103,14 +103,20 @@ namespace ProductData
             table.SafeCreateIfNotExists();
         }
 
-        public void AddProduct(Product p)
+        public bool AddProduct(Product p)
         {
             p.RowKey = p.GetRowKey().ToString();
             p.PartitionKey = p.StoreChain;
-            p.ProductId = Guid.NewGuid();
 
-            TableOperation insertOperation = TableOperation.InsertOrReplace(p);
-            table.Execute(insertOperation);
+            if (GetProductByKeys(p.PartitionKey, p.RowKey) == null)
+            {
+
+                TableOperation insertOperation = TableOperation.InsertOrReplace(p);
+                table.Execute(insertOperation);
+                return true;
+            }
+
+            return false;
         }
 
         public void AddQueue(Product p)
@@ -195,11 +201,11 @@ namespace ProductData
 
         public Product GetProductByKeys(string primaryKey, string rowKey)
         {
-            var results = from entity in table.CreateQuery<Product>()
+            var results = (from entity in table.CreateQuery<Product>()
                           where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
-                          select entity;
+                          select entity).ToList();
 
-            return results.First();
+            return results.Count ==0 ?null:results.First();
         }
 
         public IEnumerable<Product> GetProductsByCategory(Category category)

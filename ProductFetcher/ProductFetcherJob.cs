@@ -76,6 +76,7 @@ namespace ProductFetcher
                 try
                 {
                     Product product = new Product();
+                    product.ProductId = Guid.NewGuid();
                     product.StoreChain = productUrl.StoreName.ToLower();
                     product.Zipcode = productUrl.Zipcode;
                     product.Category = productUrl.Category;
@@ -103,8 +104,9 @@ namespace ProductFetcher
                     eventDescription_li.RemoveRange(0, 2);
                     product.CouponDetail = string.Join("\n", eventDescription_li.ToArray());
 
-                    productStorage.AddProduct(product);
-                    productStorage.AddQueue(product);
+                    if (productStorage.AddProduct(product))
+                        productStorage.AddQueue(product);
+
                 }
                 catch (Exception e)
                 {
@@ -113,6 +115,7 @@ namespace ProductFetcher
                 }
             }
         }
+
         private void CostcoFetcher(ProductURL productUrl)
         {
             logger.Information("Start Costco");
@@ -126,6 +129,7 @@ namespace ProductFetcher
                 {
 
                     Product product = new Product();
+                    product.ProductId = Guid.NewGuid();
                     product.Store = productUrl.StoreName.ToLower();
                     product.StoreChain = productUrl.StoreName.ToLower();
                     product.Zipcode = productUrl.Zipcode;
@@ -178,8 +182,9 @@ namespace ProductFetcher
                     }
 
 
-                    productStorage.AddProduct(product);
-                    productStorage.AddQueue(product);
+                    if (productStorage.AddProduct(product))
+                        productStorage.AddQueue(product);
+
 
                 }
                 catch (Exception e)
@@ -205,6 +210,7 @@ namespace ProductFetcher
                 try
                 {
                     Product product = new Product();
+                    product.ProductId = Guid.NewGuid();
                     //p.Category = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class = 'currentCategory']").InnerText;
                     product.Store = productUrl.StoreName.ToLower();
                     product.Category = productUrl.Category;
@@ -270,8 +276,8 @@ namespace ProductFetcher
                     product.CouponStartDate = DateTime.MaxValue;
                     product.CouponEndDate = DateTime.MaxValue;
 
-                    productStorage.AddProduct(product);
-                    productStorage.AddQueue(product);
+                    if (productStorage.AddProduct(product))
+                        productStorage.AddQueue(product);
 
                 }
                 catch (Exception e)
