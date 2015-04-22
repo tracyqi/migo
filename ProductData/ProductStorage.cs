@@ -42,12 +42,12 @@ namespace ProductData
         IEnumerable<Product> GetProductsByStore(string storeName);
         IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage = 0.15);
         IEnumerable<Product> GetProductsByName(string productName);
-        Product GetProductsById(Guid id);
+        Product GetProductById(Guid id);
         IEnumerable<Product> GetProductsByCategory(Category category);
         IEnumerable<Product> GetProductsExpired();
         void Delete(IEnumerable<Product> products);
         void AddProduct(Product p);
-        Product GetProductsByKeys(string primaryKey, string rowKey);
+        Product GetProductByKeys(string primaryKey, string rowKey);
         void AddQueue(Product p);
     }
 
@@ -143,9 +143,11 @@ namespace ProductData
             storeChainName = storeChainName.Replace("20%", " ").ToLower() ;
             /* rule to filter out products
              Costco: filter out 15% off above (by default)
-             * Maycys: all return
+             * Maycys: return top 20 most expensive ones
              * Outlet: all return
              */
+            TableQuery<Product> query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
+
             switch (storeChainName)
             {
                 case "costco":
@@ -153,16 +155,18 @@ namespace ProductData
                     //           where (entity.PartitionKey.ToLower() == "costco"//storeChainName.ToLower()
                     //           && entity.SalePrice <= 100)//entity.OriginalPrice * (1 - salePercentage))
                     //           select entity).ToList();
-                    TableQuery<Product> query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
                     results = table.ExecuteQuery(query).ToList();
                     results = results.Where(o => o.SalePrice <= o.OriginalPrice * (1 - salePercentage));
+                    break;
+                case "macys":
+                    results = table.ExecuteQuery(query).ToList();
+                    results = results.OrderByDescending(o => o.OriginalPrice).Take(20);
                     break;
                 default:
                     //results = (from entity in table.CreateQuery<Product>()
                     //           where (entity.PartitionKey.ToLower() == "macys") //== storeChainName.ToLower())
                     //               select entity).ToList();
 
-                    query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
                     results = table.ExecuteQuery(query).ToList();
                     //results = results.Where(o => o.Store == o.OriginalPrice * (1 - salePercentage));
                     break;
@@ -180,7 +184,7 @@ namespace ProductData
             return new List<Product>(results);
         }
 
-        public Product GetProductsById(Guid id)
+        public Product GetProductById(Guid id)
         {
             var results = from entity in table.CreateQuery<Product>()
                           where entity.ProductId == id
@@ -189,7 +193,7 @@ namespace ProductData
             return results.First();
         }
 
-        public Product GetProductsByKeys(string primaryKey, string rowKey)
+        public Product GetProductByKeys(string primaryKey, string rowKey)
         {
             var results = from entity in table.CreateQuery<Product>()
                           where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
@@ -231,6 +235,8 @@ namespace ProductData
             }
 
         }
+
+
     }
 
     public class ProductUrlStorage : IProductUrlStorage

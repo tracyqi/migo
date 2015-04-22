@@ -25,7 +25,7 @@ namespace ProductTranslater
              IProductStorage productStorage_ch = new ProductStorage(conn, "Products");
             ILogger logger = new Logger();
 
-            var p = (productStorage_en.GetProductsByKeys(msg.Split(',')[0], msg.Split(',')[1]));
+            var p = (productStorage_en.GetProductByKeys(msg.Split(',')[0], msg.Split(',')[1]));
 
             Product p_ch = new Product();
             p_ch.Category = p.Category;

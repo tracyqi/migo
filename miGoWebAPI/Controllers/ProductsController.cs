@@ -40,6 +40,12 @@ namespace miGoWebAPI.Controllers
             return this.storage.GetProductsByStoreChain(storeChainName);
         }
 
+        [HttpGet]
+        [ActionName("key")]
+        public Product FindProductByKeys(string partitionKey, string rowKey)
+        {
+            return this.storage.GetProductByKeys(partitionKey, rowKey);
+        }
 
         public IEnumerable<Product> GetProductsByName(string productName)
         {
@@ -50,7 +56,7 @@ namespace miGoWebAPI.Controllers
         [Route("{id:Guid}")]
         public Product GetProduct(Guid id)
         {
-            return this.storage.GetProductsById(id);
+            return this.storage.GetProductById(id);
         }
 
         [Route("{category}")]
