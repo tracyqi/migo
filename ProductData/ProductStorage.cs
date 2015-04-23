@@ -49,14 +49,15 @@ namespace ProductData
         bool AddProduct(Product p);
         Product GetProductByKeys(string primaryKey, string rowKey);
         void AddQueue(Product p);
+        IEnumerable<Product> GetAllProductsToday();
     }
 
     public interface IProductUrlStorage
     {
         IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
         IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
-
         void AddProductUrl(ProductURL purl);
+
     }
     public static class StorageExtensions
     {
@@ -103,7 +104,7 @@ namespace ProductData
             table.SafeCreateIfNotExists();
         }
 
-        public bool AddProduct(Product p)
+       public bool AddProduct(Product p)
         {
             p.RowKey = p.GetRowKey().ToString();
             p.PartitionKey = p.StoreChain;
@@ -243,6 +244,16 @@ namespace ProductData
         }
 
 
+
+
+        public IEnumerable<Product> GetAllProductsToday()
+        {
+            var results = (from entity in table.CreateQuery<Product>()
+                           where entity.Timestamp >= DateTime.Today.AddDays(-7)
+                           select entity).ToList().OrderByDescending(o => o.OriginalPrice).Take(10);
+
+            return new List<Product>(results);
+        }
     }
 
     public class ProductUrlStorage : IProductUrlStorage
