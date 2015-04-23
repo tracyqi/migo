@@ -222,7 +222,7 @@ namespace ProductData
         public IEnumerable<Product> GetProductsExpired()
         {
             var results = (from entity in table.CreateQuery<Product>()
-                           where entity.CouponEndDate <= DateTime.Now
+                           where Convert.ToDateTime(entity.CouponEndDate) <= DateTime.Now
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);

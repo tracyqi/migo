@@ -92,15 +92,24 @@ namespace ProductData
         }
         public string Category { get; set; }
 
-        [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime CouponStartDate { get; set; }
+        private DateTime couponStartDate = DateTime.MinValue;
+        public string CouponStartDate
+        {
+            get
+            { return couponStartDate.ToShortDateString(); }
+            set
+            { couponStartDate = Convert.ToDateTime(value); }
+        }
 
+        private DateTime couponEndDate = DateTime.MinValue;
+        public string CouponEndDate
+        {
+            get
+            { return couponEndDate.ToShortDateString(); }
+            set
+            { couponEndDate = Convert.ToDateTime(value); }
+        }
 
-        [DataType(DataType.Date)]
-        [DefaultValue("01/10/2001")]
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime CouponEndDate { get; set; }
 
         [StringLength(1000)]
         [DefaultValue("test")]

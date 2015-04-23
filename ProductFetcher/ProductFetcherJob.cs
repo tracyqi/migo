@@ -87,16 +87,16 @@ namespace ProductFetcher
                     //TODO: better approch to parse start/end date
                     if (couponDate.Contains("-"))
                     {
-                        product.CouponStartDate = Convert.ToDateTime(couponDate.Split('-')[0]);
+                        product.CouponStartDate = couponDate.Split('-')[0];
                         string temp = couponDate.Split('-')[1];
                         if (Char.IsNumber(temp.Trim()[0]))
-                            product.CouponEndDate = Convert.ToDateTime(couponDate.Split('-')[0].Substring(0, 3) + " " + couponDate.Split('-')[1]);
+                            product.CouponEndDate = couponDate.Split('-')[0].Substring(0, 3) + " " + couponDate.Split('-')[1];
                         else
-                            product.CouponEndDate = Convert.ToDateTime(couponDate.Split('-')[1]);
+                            product.CouponEndDate = couponDate.Split('-')[1];
                     }
                     else
                     {
-                        product.CouponStartDate = Convert.ToDateTime(couponDate);
+                        product.CouponStartDate = couponDate;
                         product.CouponEndDate = product.CouponStartDate;
                     }
                     var eventTemp = coupon.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -155,14 +155,10 @@ namespace ProductFetcher
                     if (y != null)
                     {
                         var validDate = y.InnerText.Split(' ');
-                        product.CouponStartDate = Convert.ToDateTime(validDate[5]);
-                        product.CouponEndDate = Convert.ToDateTime(validDate[7].Replace(".", string.Empty));
+                        product.CouponStartDate = validDate[5];
+                        product.CouponEndDate = validDate[7].Replace(".", string.Empty);
                     }
-                    else
-                    {
-                        product.CouponStartDate = DateTime.MaxValue;
-                        product.CouponEndDate = DateTime.MaxValue;
-                    }
+
 
                     var price = productDetail.SelectSingleNode(".//*[contains(@class,'your-price')]").SelectSingleNode(".//*[contains(@class,'currency')]");
                     if (!string.IsNullOrEmpty(price.InnerText))
@@ -272,9 +268,6 @@ namespace ProductFetcher
 
                         }
                     }
-
-                    product.CouponStartDate = DateTime.MaxValue;
-                    product.CouponEndDate = DateTime.MaxValue;
 
                     if (productStorage.AddProduct(product))
                         productStorage.AddQueue(product);
