@@ -42,7 +42,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productName = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
+                productName = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
@@ -86,7 +86,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productDescription = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
+                productDescription = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
@@ -128,7 +128,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                couponDetail = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;|#039;)", ""));
+                couponDetail = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
