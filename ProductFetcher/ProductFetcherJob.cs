@@ -34,31 +34,47 @@ namespace ProductFetcher
         public string FetchData()
         {
             IEnumerable<ProductURL> urls = GetProductUrls();
+
             foreach (ProductURL u in urls)
             {
+                DailyMetric dm = new DailyMetric();
+
                 switch (u.StoreChain)
                 {
                     case "Costco":
-                        CostcoFetcher(u);
+                        dm = CostcoFetcher(u);
                         break;
                     case "Macys":
-                        MacysFetcher(u);
+                        dm = MacysFetcher(u);
                         break;
                     case "Premium Outlets":
-                        OutletFetcher(u);
+                        dm= OutletFetcher(u);
                         break;
                     default:
                         logger.Error("Wrong Store name");
                         break;
+                }
+
+                using (var ygm = new ygmEntities())
+                {
+                    dm.StoreName = u.StoreName;
+                    dm.StoreChain = u.StoreChain;
+                    dm.Category = u.Category;
+                    dm.CreatedDate = DateTime.Now;
+
+                    ygm.DailyMetrics.Add(dm);
+                    ygm.SaveChanges();
                 }
             }
 
             return string.Empty;
         }
 
-        private void OutletFetcher(ProductURL productUrl)
+        private DailyMetric OutletFetcher(ProductURL productUrl)
         {
             logger.Information("Start Outlet");
+            int totalnumber = 0;
+            int totalNewNumber = 0;
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDocument = htmlWeb.Load(productUrl.ProductUrl);
 
@@ -105,8 +121,13 @@ namespace ProductFetcher
                     product.CouponDetail = string.Join("\n", eventDescription_li.ToArray());
 
                     if (productStorage.AddProduct(product))
+                    {
                         productStorage.AddQueue(product);
+                        totalNewNumber++;
+                    }
+                    totalnumber++;
 
+                    KeepHeartbeat(totalnumber, productUrl.StoreChain);
                 }
                 catch (Exception e)
                 {
@@ -114,10 +135,18 @@ namespace ProductFetcher
                     continue;
                 }
             }
+
+            DailyMetric dm = new DailyMetric();
+            dm.NumOfRecords = totalnumber;
+            dm.NumOfNewRecords = totalNewNumber;
+
+            return dm;
         }
 
-        private void CostcoFetcher(ProductURL productUrl)
+        private DailyMetric CostcoFetcher(ProductURL productUrl)
         {
+            int totalnumber = 0;
+            int totalNewNumber = 0;
             logger.Information("Start Costco");
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDocument = htmlWeb.Load(productUrl.ProductUrl);
@@ -177,9 +206,13 @@ namespace ProductFetcher
                         product.OriginalPrice = product.SalePrice;
                     }
 
-
                     if (productStorage.AddProduct(product))
+                    {
                         productStorage.AddQueue(product);
+                        totalNewNumber++;
+                    }
+                    totalnumber++;
+                    KeepHeartbeat(totalnumber, productUrl.StoreChain);
 
 
                 }
@@ -188,11 +221,21 @@ namespace ProductFetcher
                     logger.Error("failed one:", e.StackTrace);
                     continue;
                 }
+
+
             }
+
+            DailyMetric dm = new DailyMetric();
+            dm.NumOfRecords = totalnumber;
+            dm.NumOfNewRecords = totalNewNumber;
+
+            return dm;
         }
 
-        private void MacysFetcher(ProductURL productUrl)
+        private DailyMetric MacysFetcher(ProductURL productUrl)
         {
+            int totalnumber = 0;
+            int totalNewNumber = 0;
             logger.Information("Start Macy");
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDocument = htmlWeb.Load(productUrl.ProductUrl);
@@ -268,9 +311,14 @@ namespace ProductFetcher
 
                         }
                     }
-
                     if (productStorage.AddProduct(product))
+                    {
                         productStorage.AddQueue(product);
+                        totalNewNumber++;
+                    }
+                    totalnumber++;
+                    KeepHeartbeat(totalnumber, productUrl.StoreChain);
+
 
                 }
                 catch (Exception e)
@@ -278,7 +326,22 @@ namespace ProductFetcher
                     logger.Error("failed one:", e.StackTrace);
                     continue;
                 }
+
+
             }
+
+            DailyMetric dm = new DailyMetric();
+            dm.NumOfRecords = totalnumber;
+            dm.NumOfNewRecords = totalNewNumber;
+
+
+            return dm;
+        }
+
+        private void KeepHeartbeat(int totalNumber, string storeChain)
+        {
+            if (totalNumber % 25 == 0)
+                Console.WriteLine(string.Format("{0}:{1}", storeChain, totalNumber));
         }
     }
 }

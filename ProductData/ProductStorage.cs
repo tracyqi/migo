@@ -50,7 +50,8 @@ namespace ProductData
         Product GetProductByKeys(string primaryKey, string rowKey);
         void AddQueue(Product p);
         IEnumerable<Product> GetAllProductsToday();
-        int Count(bool today=false);
+        int Count(bool today = false);
+        void FindProducts(string pKey);
     }
 
     public interface IProductUrlStorage
@@ -105,7 +106,7 @@ namespace ProductData
             table.SafeCreateIfNotExists();
         }
 
-       public bool AddProduct(Product p)
+        public bool AddProduct(Product p)
         {
             p.RowKey = p.GetRowKey().ToString();
             p.PartitionKey = p.StoreChain;
@@ -148,7 +149,7 @@ namespace ProductData
             IEnumerable<Product> results = null;
 
             //storeChainName = WebUtility.HtmlDecode(storeChainName);
-            storeChainName = storeChainName.Replace("20%", " ").ToLower() ;
+            storeChainName = storeChainName.Replace("20%", " ").ToLower();
             /* rule to filter out products
              Costco: filter out 15% off above (by default)
              * Maycys: return top 20 most expensive ones
@@ -204,10 +205,10 @@ namespace ProductData
         public Product GetProductByKeys(string primaryKey, string rowKey)
         {
             var results = (from entity in table.CreateQuery<Product>()
-                          where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
-                          select entity).ToList();
+                           where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
+                           select entity).ToList();
 
-            return results.Count ==0 ?null:results.First();
+            return results.Count == 0 ? null : results.First();
         }
 
         public IEnumerable<Product> GetProductsByCategory(Category category)
@@ -253,7 +254,7 @@ namespace ProductData
             return new List<Product>(results);
         }
 
-        public int Count(bool today=false)
+        public int Count(bool today = false)
         {
             var c = (from entity in table.CreateQuery<Product>()
                      select new { entity.PartitionKey, entity.RowKey, entity.Timestamp }).ToList();
@@ -264,6 +265,25 @@ namespace ProductData
             }
 
             return c.Count();
+        }
+
+        public void FindProducts(string pKey)
+        {
+            var c = (from entity in table.CreateQuery<Product>()
+                     where entity.PartitionKey == pKey
+                     select entity).ToList();
+
+            foreach (var line in c.GroupBy(info => info.ProductName)
+                        .Select(group => new
+                        {
+                            Metric = group.Key,
+                            Count = group.Count()
+                        }).Where (o=>o.Count >1)
+                        .OrderBy(x => x.Metric))
+            {
+                Console.WriteLine("{0} {1}", line.Metric, line.Count);
+            }
+            Console.ReadLine();
         }
     }
 

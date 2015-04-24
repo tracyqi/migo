@@ -18,5 +18,8 @@ namespace ProductFetcher
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<long> NumOfRecords { get; set; }
         public Nullable<long> NumOfNewRecords { get; set; }
+        public string StoreName { get; set; }
+        public string StoreChain { get; set; }
+        public string Category { get; set; }
     }
 }

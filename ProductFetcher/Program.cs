@@ -20,8 +20,8 @@ namespace ProductFetcher
             //GenerateProductUrlsTable();
             //GenerateOutletUrls();
 
-            //ProductFetcherJob j = new ProductFetcherJob();
-            //j.FetchData();
+            ProductFetcherJob j = new ProductFetcherJob();
+            j.FetchData();
 
             InsertDailyMetrics();
         }
@@ -31,6 +31,7 @@ namespace ProductFetcher
             string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
             IProductStorage productStorage = new ProductStorage(conn, "productsen");
 
+            productStorage.FindProducts("costco");
             //insert
             using (var dm = new ygmEntities())
             {
