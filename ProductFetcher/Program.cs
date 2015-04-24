@@ -22,8 +22,6 @@ namespace ProductFetcher
 
             ProductFetcherJob j = new ProductFetcherJob();
             j.FetchData();
-
-            InsertDailyMetrics();
         }
 
         private static void InsertDailyMetrics()

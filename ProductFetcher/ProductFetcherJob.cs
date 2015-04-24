@@ -213,8 +213,6 @@ namespace ProductFetcher
                     }
                     totalnumber++;
                     KeepHeartbeat(totalnumber, productUrl.StoreChain);
-
-
                 }
                 catch (Exception e)
                 {
@@ -318,8 +316,6 @@ namespace ProductFetcher
                     }
                     totalnumber++;
                     KeepHeartbeat(totalnumber, productUrl.StoreChain);
-
-
                 }
                 catch (Exception e)
                 {
@@ -340,7 +336,7 @@ namespace ProductFetcher
 
         private void KeepHeartbeat(int totalNumber, string storeChain)
         {
-            if (totalNumber % 25 == 0)
+            //if (totalNumber % 25 == 0)
                 Console.WriteLine(string.Format("{0}:{1}", storeChain, totalNumber));
         }
     }
