@@ -20,8 +20,29 @@ namespace ProductFetcher
             //GenerateProductUrlsTable();
             //GenerateOutletUrls();
 
-            ProductFetcherJob j = new ProductFetcherJob();
-            j.FetchData();
+            //ProductFetcherJob j = new ProductFetcherJob();
+            //j.FetchData();
+
+            InsertDailyMetrics();
+        }
+
+        private static void InsertDailyMetrics()
+        {
+            string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
+            IProductStorage productStorage = new ProductStorage(conn, "productsen");
+
+            //insert
+            using (var dm = new ygmEntities())
+            {
+                dm.DailyMetrics.Add(new DailyMetric()
+                {
+                    NumOfRecords = productStorage.Count(),
+                    NumOfNewRecords = productStorage.Count(true)
+
+                });
+                dm.SaveChanges();
+
+            }
         }
 
         // This is a temporary function to generate producturl table

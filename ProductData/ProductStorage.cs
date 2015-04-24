@@ -50,6 +50,7 @@ namespace ProductData
         Product GetProductByKeys(string primaryKey, string rowKey);
         void AddQueue(Product p);
         IEnumerable<Product> GetAllProductsToday();
+        int Count(bool today=false);
     }
 
     public interface IProductUrlStorage
@@ -243,9 +244,6 @@ namespace ProductData
 
         }
 
-
-
-
         public IEnumerable<Product> GetAllProductsToday()
         {
             var results = (from entity in table.CreateQuery<Product>()
@@ -253,6 +251,19 @@ namespace ProductData
                            select entity).ToList().OrderByDescending(o => o.OriginalPrice).Take(10);
 
             return new List<Product>(results);
+        }
+
+        public int Count(bool today=false)
+        {
+            var c = (from entity in table.CreateQuery<Product>()
+                     select new { entity.PartitionKey, entity.RowKey, entity.Timestamp }).ToList();
+
+            if (today)
+            {
+                return c.Where(o => (DateTime.Now - o.Timestamp).Days < 1).Count();
+            }
+
+            return c.Count();
         }
     }
 
