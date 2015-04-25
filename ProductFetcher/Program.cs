@@ -20,8 +20,11 @@ namespace ProductFetcher
             //GenerateProductUrlsTable();
             //GenerateOutletUrls();
 
+            InsertDailyMetrics();
+
             ProductFetcherJob j = new ProductFetcherJob();
             j.FetchData();
+
         }
 
         private static void InsertDailyMetrics()
@@ -29,18 +32,12 @@ namespace ProductFetcher
             string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
             IProductStorage productStorage = new ProductStorage(conn, "productsen");
 
-            productStorage.FindProducts("costco");
-            //insert
-            using (var dm = new ygmEntities())
+            //productStorage.FindProducts("costco");
+            IEnumerable<Product> products = productStorage.FindTopProducts();
+
+            foreach (var c in products)
             {
-                dm.DailyMetrics.Add(new DailyMetric()
-                {
-                    NumOfRecords = productStorage.Count(),
-                    NumOfNewRecords = productStorage.Count(true)
-
-                });
-                dm.SaveChanges();
-
+                Console.WriteLine(string.Format ("{0}, {1}, {2},{3}, ", c.ProductName, c.Store, c.OriginalPrice, c.SalePrice));
             }
         }
 

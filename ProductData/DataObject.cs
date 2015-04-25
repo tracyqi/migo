@@ -21,7 +21,9 @@ namespace ProductData
         [Display(Name = "Beauty Prodcut")]
         Cosmetology,
         [Display(Name = "Cloth")]
-        Cloth
+        Cloth,
+        [Display(Name = "Handbag")]
+        Handbag
     }
 
     public class Product : TableEntity

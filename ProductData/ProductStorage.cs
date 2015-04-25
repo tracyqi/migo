@@ -52,6 +52,7 @@ namespace ProductData
         IEnumerable<Product> GetAllProductsToday();
         int Count(bool today = false);
         void FindProducts(string pKey);
+        IEnumerable<Product> FindTopProducts();
     }
 
     public interface IProductUrlStorage
@@ -284,6 +285,14 @@ namespace ProductData
                 Console.WriteLine("{0} {1}", line.Metric, line.Count);
             }
             Console.ReadLine();
+        }
+
+
+        public IEnumerable<Product> FindTopProducts()
+        {
+            return (from entity in table.CreateQuery<Product>()
+                     //where entity.PartitionKey == pKey
+                     select entity).ToList().OrderByDescending(o=>o.OriginalPrice).Take(20);
         }
     }
 
