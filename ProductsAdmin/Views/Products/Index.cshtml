@@ -1,0 +1,20 @@
+﻿@model IEnumerable<ProductsAdmin.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>All Stores</h2>
+
+<p>
+    @*@Html.ActionLink("Create New", "Create")*@
+
+</p>
+
+<div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+        <li>@Html.ActionLink("Costco", "Costco", "Products")</li>
+        <li>@Html.ActionLink("Macys", "Macys", "Products")</li>
+        <li>@Html.ActionLink("Outlets", "Outlets", "Products")</li>
+    </ul>
+</div>

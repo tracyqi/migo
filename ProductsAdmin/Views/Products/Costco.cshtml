@@ -1,0 +1,135 @@
+﻿@model IEnumerable<ProductsAdmin.Models.Product>
+
+@{
+    ViewBag.Title = "Costco";
+}
+
+<h2>Costco</h2>
+
+@*<p>
+    @Html.ActionLink("Create New", "Create")
+</p>*@
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Store)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.StoreChain)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.ProductSKU)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.ProductURL)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductImage)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.ProductDescription)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.Category)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.CouponStartDate)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.CouponEndDate)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.CouponDetail)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.OriginalPrice)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.SalePrice)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.SaleCity)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.PartitionKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RowKey)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.Timestamp)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ETag)
+        </th>*@
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Store)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.StoreChain)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.ProductSKU)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.ProductURL)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductImage)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductDescription)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.Category)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.CouponStartDate)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.CouponEndDate)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.CouponDetail)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.OriginalPrice)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.SalePrice)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.SaleCity)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.PartitionKey)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RowKey)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.Timestamp)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ETag)
+        </td>*@
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { PartitionKey = item.PartitionKey, RowKey = item.RowKey })
+            @*@Html.ActionLink("Details", "Details", new { PartitionKey = item.PartitionKey, RowKey = item.RowKey }) |
+            @Html.ActionLink("Delete", "Delete", new { PartitionKey = item.PartitionKey, RowKey = item.RowKey })*@
+        </td>
+    </tr>
+}
+
+</table>
