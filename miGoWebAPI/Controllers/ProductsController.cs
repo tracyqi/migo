@@ -28,6 +28,8 @@ namespace miGoWebAPI.Controllers
             this.storage = productStorage;
         }
 
+        [HttpGet]
+        [ActionName("all")]
         public IEnumerable<Product> GetProducts()
         {
             return this.storage.GetAllProducts();
@@ -40,44 +42,36 @@ namespace miGoWebAPI.Controllers
             return this.storage.GetProductsByStoreChain(storeChainName);
         }
 
+        [HttpGet]
+        [ActionName("key")]
+        public Product FindProductByKeys(string partitionKey, string rowKey)
+        {
+            return this.storage.GetProductByKeys(partitionKey, rowKey);
+        }
 
+        [HttpGet]
+        [ActionName("name")]
         public IEnumerable<Product> GetProductsByName(string productName)
         {
             return this.storage.GetProductsByName(productName);
         }
 
-        // GET api/Products/5
-        [Route("{id:Guid}")]
-        public Product GetProduct(Guid id)
-        {
-            return this.storage.GetProductsById(id);
-        }
-
-        [Route("{category}")]
+        //[Route("{category}")]
+        [HttpGet]
+        [ActionName("category")]
         public IEnumerable<Product> GetProductsByCategory(string category)
         {
             Category c;
 
             Enum.TryParse<Category>(category, out c);
             return this.storage.GetProductsByCategory(c);
+        }
 
+        [HttpGet]
+        [ActionName("today")]
+        public IEnumerable<Product> FindProductByKeys()
+        {
+            return this.storage.GetAllProductsToday();
         }
     }
-
-
-    //// POST: api/Coupon
-    //public void Post([FromBody]string value)
-    //{
-    //}
-
-    //// PUT: api/Coupon/5
-    //public void Put(int id, [FromBody]string value)
-    //{
-    //}
-
-    //// DELETE: api/Coupon/5
-    //public void Delete(int id)
-    //{
-    //}
-    //}
 }

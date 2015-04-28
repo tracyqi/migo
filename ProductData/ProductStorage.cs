@@ -19,6 +19,49 @@ using Microsoft.WindowsAzure.Storage.Table.Protocol;
 namespace ProductData
 {
 
+    public interface IImageStorage
+    {
+        IEnumerable<string> GetShufflesOlderThan(DateTime date);
+
+        IEnumerable<Uri> GetAllShuffleParts(string shuffleId);
+
+        Uri GetImageLink(string shuffleId);
+
+        bool IsReadonly(string shuffleId);
+
+        void AddNewPart(string shuffleId, string fileName, Stream fileStream);
+
+        void RequestShuffle(string shuffleId);
+
+        void Delete(string shuffleId);
+    }
+
+    public interface IProductStorage
+    {
+        IEnumerable<Product> GetAllProducts();
+        IEnumerable<Product> GetProductsByStore(string storeName);
+        IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage = 0.15);
+        IEnumerable<Product> GetProductsByName(string productName);
+        Product GetProductById(Guid id);
+        IEnumerable<Product> GetProductsByCategory(Category category);
+        IEnumerable<Product> GetProductsExpired();
+        void Delete(IEnumerable<Product> products);
+        bool AddProduct(Product p);
+        Product GetProductByKeys(string primaryKey, string rowKey);
+        void AddQueue(Product p);
+        IEnumerable<Product> GetAllProductsToday();
+        int Count(bool today = false);
+        void FindProducts(string pKey);
+        IEnumerable<Product> FindTopProducts();
+    }
+
+    public interface IProductUrlStorage
+    {
+        IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
+        IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
+        void AddProductUrl(ProductURL purl);
+
+    }
     public static class StorageExtensions
     {
         public static bool SafeCreateIfNotExists(this CloudTable table, TableRequestOptions requestOptions = null, OperationContext operationContext = null)
@@ -64,15 +107,24 @@ namespace ProductData
             table.SafeCreateIfNotExists();
         }
 
-        public void AddProduct(Product p)
+        public bool AddProduct(Product p)
         {
             p.RowKey = p.GetRowKey().ToString();
             p.PartitionKey = p.StoreChain;
-            p.ProductId = Guid.NewGuid();
 
-            TableOperation insertOperation = TableOperation.InsertOrReplace(p);
-            table.Execute(insertOperation);
+            if (GetProductByKeys(p.PartitionKey, p.RowKey) == null)
+            {
 
+                TableOperation insertOperation = TableOperation.InsertOrReplace(p);
+                table.Execute(insertOperation);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void AddQueue(Product p)
+        {
             CloudQueueMessage cloudQueueMessage = new CloudQueueMessage(p.PartitionKey + "," + p.RowKey);
             queue.AddMessage(cloudQueueMessage);
         }
@@ -98,12 +150,14 @@ namespace ProductData
             IEnumerable<Product> results = null;
 
             //storeChainName = WebUtility.HtmlDecode(storeChainName);
-            storeChainName = storeChainName.Replace("20%", " ").ToLower() ;
+            storeChainName = storeChainName.Replace("20%", " ").ToLower();
             /* rule to filter out products
              Costco: filter out 15% off above (by default)
-             * Maycys: all return
+             * Maycys: return top 20 most expensive ones
              * Outlet: all return
              */
+            TableQuery<Product> query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
+
             switch (storeChainName)
             {
                 case "costco":
@@ -111,16 +165,18 @@ namespace ProductData
                     //           where (entity.PartitionKey.ToLower() == "costco"//storeChainName.ToLower()
                     //           && entity.SalePrice <= 100)//entity.OriginalPrice * (1 - salePercentage))
                     //           select entity).ToList();
-                    TableQuery<Product> query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
                     results = table.ExecuteQuery(query).ToList();
                     results = results.Where(o => o.SalePrice <= o.OriginalPrice * (1 - salePercentage));
+                    break;
+                case "macys":
+                    results = table.ExecuteQuery(query).ToList();
+                    results = results.OrderByDescending(o => o.OriginalPrice).Take(20);
                     break;
                 default:
                     //results = (from entity in table.CreateQuery<Product>()
                     //           where (entity.PartitionKey.ToLower() == "macys") //== storeChainName.ToLower())
                     //               select entity).ToList();
 
-                    query = new TableQuery<Product>().Where(TableQuery.GenerateFilterCondition("StoreChain", QueryComparisons.Equal, storeChainName));
                     results = table.ExecuteQuery(query).ToList();
                     //results = results.Where(o => o.Store == o.OriginalPrice * (1 - salePercentage));
                     break;
@@ -138,7 +194,7 @@ namespace ProductData
             return new List<Product>(results);
         }
 
-        public Product GetProductsById(Guid id)
+        public Product GetProductById(Guid id)
         {
             var results = from entity in table.CreateQuery<Product>()
                           where entity.ProductId == id
@@ -147,13 +203,13 @@ namespace ProductData
             return results.First();
         }
 
-        public Product GetProductsByKeys(string primaryKey, string rowKey)
+        public Product GetProductByKeys(string primaryKey, string rowKey)
         {
-            var results = from entity in table.CreateQuery<Product>()
-                          where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
-                          select entity;
+            var results = (from entity in table.CreateQuery<Product>()
+                           where entity.PartitionKey == primaryKey && entity.RowKey == rowKey
+                           select entity).ToList();
 
-            return results.First();
+            return results.Count == 0 ? null : results.First();
         }
 
         public IEnumerable<Product> GetProductsByCategory(Category category)
@@ -169,7 +225,7 @@ namespace ProductData
         public IEnumerable<Product> GetProductsExpired()
         {
             var results = (from entity in table.CreateQuery<Product>()
-                           where entity.CouponEndDate <= DateTime.Now
+                           where Convert.ToDateTime(entity.CouponEndDate) <= DateTime.Now
                            select entity).Take(100).ToList();
 
             return new List<Product>(results);
@@ -188,6 +244,55 @@ namespace ProductData
                 table.Execute(deleteOperation);
             }
 
+        }
+
+        public IEnumerable<Product> GetAllProductsToday()
+        {
+            var results = (from entity in table.CreateQuery<Product>()
+                           where entity.Timestamp >= DateTime.Today.AddDays(-7)
+                           select entity).ToList().OrderByDescending(o => o.OriginalPrice).Take(10);
+
+            return new List<Product>(results);
+        }
+
+        public int Count(bool today = false)
+        {
+            var c = (from entity in table.CreateQuery<Product>()
+                     select new { entity.PartitionKey, entity.RowKey, entity.Timestamp }).ToList();
+
+            if (today)
+            {
+                return c.Where(o => (DateTime.Now - o.Timestamp).Days < 1).Count();
+            }
+
+            return c.Count();
+        }
+
+        public void FindProducts(string pKey)
+        {
+            var c = (from entity in table.CreateQuery<Product>()
+                     where entity.PartitionKey == pKey
+                     select entity).ToList();
+
+            foreach (var line in c.GroupBy(info => info.ProductName)
+                        .Select(group => new
+                        {
+                            Metric = group.Key,
+                            Count = group.Count()
+                        }).Where (o=>o.Count >1)
+                        .OrderBy(x => x.Metric))
+            {
+                Console.WriteLine("{0} {1}", line.Metric, line.Count);
+            }
+            Console.ReadLine();
+        }
+
+
+        public IEnumerable<Product> FindTopProducts()
+        {
+            return (from entity in table.CreateQuery<Product>()
+                     //where entity.PartitionKey == pKey
+                     select entity).ToList().OrderByDescending(o=>o.OriginalPrice).Take(20);
         }
     }
 

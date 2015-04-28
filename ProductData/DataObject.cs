@@ -12,44 +12,7 @@ using System.Threading.Tasks;
 
 namespace ProductData
 {
-    public interface IImageStorage
-    {
-        IEnumerable<string> GetShufflesOlderThan(DateTime date);
 
-        IEnumerable<Uri> GetAllShuffleParts(string shuffleId);
-
-        Uri GetImageLink(string shuffleId);
-
-        bool IsReadonly(string shuffleId);
-
-        void AddNewPart(string shuffleId, string fileName, Stream fileStream);
-
-        void RequestShuffle(string shuffleId);
-
-        void Delete(string shuffleId);
-    }
-
-    public interface IProductStorage
-    {
-        IEnumerable<Product> GetAllProducts();
-        IEnumerable<Product> GetProductsByStore(string storeName);
-        IEnumerable<Product> GetProductsByStoreChain(string storeChainName, double salePercentage=0.15);
-        IEnumerable<Product> GetProductsByName(string productName);
-        Product GetProductsById(Guid id);
-        IEnumerable<Product> GetProductsByCategory(Category category);
-        IEnumerable<Product> GetProductsExpired();
-        void Delete(IEnumerable<Product> products);
-        void AddProduct(Product p);
-        Product GetProductsByKeys(string primaryKey, string rowKey);
-    }
-
-    public interface IProductUrlStorage
-    {
-        IEnumerable<ProductURL> GetAllProductUrls(bool active = true);
-        IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
-
-        void AddProductUrl(ProductURL purl);
-    }
 
     public enum Category
     {
@@ -58,7 +21,9 @@ namespace ProductData
         [Display(Name = "Beauty Prodcut")]
         Cosmetology,
         [Display(Name = "Cloth")]
-        Cloth
+        Cloth,
+        [Display(Name = "Handbag")]
+        Handbag
     }
 
     public class Product : TableEntity
@@ -79,7 +44,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productName = utf8.GetBytes(value);
+                productName = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
@@ -123,21 +88,30 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                productDescription = utf8.GetBytes(Regex.Replace(value, @"(&amp;|amp;)", ""));
+                productDescription = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
         public string Category { get; set; }
 
-        [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime CouponStartDate { get; set; }
+        private DateTime couponStartDate = DateTime.MinValue;
+        public string CouponStartDate
+        {
+            get
+            { return couponStartDate.ToShortDateString(); }
+            set
+            { couponStartDate = Convert.ToDateTime(value); }
+        }
 
+        private DateTime couponEndDate = DateTime.MinValue;
+        public string CouponEndDate
+        {
+            get
+            { return couponEndDate.ToShortDateString(); }
+            set
+            { couponEndDate = Convert.ToDateTime(value); }
+        }
 
-        [DataType(DataType.Date)]
-        [DefaultValue("01/10/2001")]
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime CouponEndDate { get; set; }
 
         [StringLength(1000)]
         [DefaultValue("test")]
@@ -156,7 +130,7 @@ namespace ProductData
             set
             {
                 UTF8Encoding utf8 = new UTF8Encoding();
-                couponDetail = utf8.GetBytes(value);
+                couponDetail = utf8.GetBytes(Utilities.StripHTML(value));
 
             }
         }
@@ -184,7 +158,7 @@ namespace ProductData
                 this.CouponDetail == null ? string.Empty : this.CouponDetail,
                 this.CouponStartDate,
                 this.CouponEndDate,
-                this.ProductId,
+                //this.ProductId,
                 this.ProductName == null ? string.Empty : this.ProductName,
                 //this.ProductSKU, 
                 this.OriginalPrice,

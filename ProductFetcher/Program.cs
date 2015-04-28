@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using HtmlAgilityPack;
+using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductData;
@@ -17,9 +18,27 @@ namespace ProductFetcher
             //jobHost.RunAndBlock();
 
             //GenerateProductUrlsTable();
+            //GenerateOutletUrls();
+
+            InsertDailyMetrics();
 
             ProductFetcherJob j = new ProductFetcherJob();
             j.FetchData();
+
+        }
+
+        private static void InsertDailyMetrics()
+        {
+            string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
+            IProductStorage productStorage = new ProductStorage(conn, "productsen");
+
+            //productStorage.FindProducts("costco");
+            IEnumerable<Product> products = productStorage.FindTopProducts();
+
+            foreach (var c in products)
+            {
+                Console.WriteLine(string.Format ("{0}, {1}, {2},{3}, ", c.ProductName, c.Store, c.OriginalPrice, c.SalePrice));
+            }
         }
 
         // This is a temporary function to generate producturl table
@@ -54,6 +73,35 @@ namespace ProductFetcher
                     p.IsActive = true;
 
                     productUrlStorage.AddProductUrl(p);
+                }
+            }
+        }
+
+        private static void GenerateOutletUrls()
+        {
+            string url = "http://www.premiumoutlets.com/centers/index.asp";
+
+            HtmlWeb htmlWeb = new HtmlWeb();
+            HtmlDocument htmlDocument = htmlWeb.Load(url);
+            //<select name="selectstate" class="selectmenu mb-20 cap" id="selectstate" >
+            //  <option data-title="Phoenix Premium Outlets" data-short="Phoenix" data-address="4976 Premium Outlets Way" data-city="Chandler" data-state="AZ" data-zip="85226" value="105">
+            // Premium Outlets	Columbia Gorge Premium Outlets	Cloth	http://www.premiumoutlets.com/outlets/sales.asp?id=28	97060
+
+            foreach (var p in htmlDocument.DocumentNode.SelectNodes(".//option[@data-title]"))
+            {
+               // var data = p.SelectSingleNode(".//option[@data-title]");
+                string datatitle = p.Attributes["data-title"].Value;
+                string zip = p.Attributes["data-zip"].Value;
+                string id = p.Attributes["value"].Value;
+
+                using (StreamWriter w = File.AppendText(@"f:\ProductUrls.csv"))
+                {
+                    w.WriteLine(string.Concat("Premium Outlets", "\t", 
+                        datatitle, "\t", 
+                        "Cloth", "\t", 
+                        "http://www.premiumoutlets.com/outlets/sales.asp?id="+id, "\t", 
+                        zip                     
+                        ));
                 }
             }
         }

@@ -24,5 +24,16 @@ namespace ProductData
             }
             return sb.ToString();
         }
+
+        public static string StripHTML(string msg)
+        {
+            System.Text.RegularExpressions.Regex rx = new System.Text.RegularExpressions.Regex(@"<[^>]+>|&nbsp;|&amp;|amp;|#039;|#034;");
+            // replace all matches with empty string
+            string str = rx.Replace(msg, "");
+
+            return str;
+        }
+
+
     }
 }
