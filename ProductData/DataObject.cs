@@ -26,6 +26,14 @@ namespace ProductData
         Handbag
     }
 
+    public class Competitor: TableEntity
+    {
+        [StringLength(1000)]
+        public string CompetitorName { get; set; }
+        public double PriceLow { get; set; }
+        public double PriceHigh { get; set; }
+    }
+
     public class Product : TableEntity
     {
         public Guid ProductId { get; set; }

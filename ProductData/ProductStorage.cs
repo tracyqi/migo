@@ -53,6 +53,8 @@ namespace ProductData
         int Count(bool today = false);
         void FindProducts(string pKey);
         IEnumerable<Product> FindTopProducts();
+        IEnumerable<Product> GetAllProductsWithName();
+
     }
 
     public interface IProductUrlStorage
@@ -61,6 +63,11 @@ namespace ProductData
         IEnumerable<ProductURL> GetAllProductsByStore(string storeName, bool active = true);
         void AddProductUrl(ProductURL purl);
 
+    }
+
+    public interface ICompetitorStorage
+    {
+        void AddCompetitor(Product p, string competitor, int price);
     }
     public static class StorageExtensions
     {
@@ -279,7 +286,7 @@ namespace ProductData
                         {
                             Metric = group.Key,
                             Count = group.Count()
-                        }).Where (o=>o.Count >1)
+                        }).Where(o => o.Count > 1)
                         .OrderBy(x => x.Metric))
             {
                 Console.WriteLine("{0} {1}", line.Metric, line.Count);
@@ -291,8 +298,18 @@ namespace ProductData
         public IEnumerable<Product> FindTopProducts()
         {
             return (from entity in table.CreateQuery<Product>()
-                     //where entity.PartitionKey == pKey
-                     select entity).ToList().OrderByDescending(o=>o.OriginalPrice).Take(20);
+                    //where entity.PartitionKey == pKey
+                    select entity).ToList().OrderByDescending(o => o.OriginalPrice).Take(20);
+        }
+
+
+        public IEnumerable<Product> GetAllProductsWithName()
+        {
+
+            TableQuery query = new TableQuery().Where(TableQuery.GenerateFilterCondition("ProductName", QueryComparisons.Equal, ""));
+            return (from entity in table.CreateQuery<Product>()
+                    where  entity.PartitionKey == "macys" || entity.PartitionKey == "costco"
+                    select entity).ToList();
         }
     }
 
@@ -346,6 +363,34 @@ namespace ProductData
 
             TableOperation insertOperation = TableOperation.InsertOrReplace(purl);
             table.Execute(insertOperation);
+        }
+    }
+
+    public class CompetitorStorage : ICompetitorStorage
+    {
+        private readonly CloudStorageAccount storageAccount;
+        private readonly CloudTableClient tableClient;
+        private readonly CloudTable table;
+
+
+
+
+        public CompetitorStorage(string connectionString)
+            : this(CloudStorageAccount.Parse(connectionString), "Competitor")
+        {
+        }
+
+        public CompetitorStorage(CloudStorageAccount storageAccount, string tableName)
+        {
+            this.storageAccount = storageAccount;
+            this.tableClient = storageAccount.CreateCloudTableClient();
+            this.table = tableClient.GetTableReference(tableName);
+            table.SafeCreateIfNotExists();
+        }
+
+        public void AddCompetitor(Product p, string competitor, int price)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using ProductData;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,50 @@ namespace ProductFetcher
             //GenerateProductUrlsTable();
             //GenerateOutletUrls();
 
-            InsertDailyMetrics();
+            //InsertDailyMetrics();
 
-            ProductFetcherJob j = new ProductFetcherJob();
-            j.FetchData();
+            //ProductFetcherJob j = new ProductFetcherJob();
+            //j.FetchData();
+
+            ParseCompetitor();
+        }
+
+        private static void ParseCompetitor()
+        {
+            string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
+            IProductStorage productStorage = new ProductStorage(conn, "productsen");
+            ICompetitorStorage competitor = new CompetitorStorage(conn);
+
+            var products = productStorage.GetAllProductsWithName();
+
+            foreach (var p in products)
+            {
+                FindCompetitorPrices(p.ProductName);
+            }
+        }
+
+        private static void FindCompetitorPrices(string pName)
+        {
+            
+            string taobao_url = "http://s.taobao.com/search?q={0}&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20150429&ie=utf8";
+
+            string url = string.Format(taobao_url, Utilities.ToHTML(pName));
+            HtmlWeb htmlWeb = new HtmlWeb();
+            HtmlDocument htmlDocument = htmlWeb.Load(url);
+
+            var scripts = htmlDocument.DocumentNode.SelectNodes("//script");
+            string json= string.Empty;
+            foreach(var s in scripts)
+            {
+                if (s.InnerText.Contains("g_page_config"))
+                {
+                    json = s.InnerText;
+                    break;
+                }
+            }
+
+            dynamic dynObj = JsonConvert.DeserializeObject(json);
+
 
         }
 

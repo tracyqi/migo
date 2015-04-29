@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ProductData
 {
-    class Utilities
+    public class Utilities
     {
         public static string CalculateMD5Hash(string input)
         {
@@ -34,6 +35,10 @@ namespace ProductData
             return str;
         }
 
+        public static string ToHTML(string msg)
+        {
+            return WebUtility.HtmlEncode(msg);
+        }
 
     }
 }
