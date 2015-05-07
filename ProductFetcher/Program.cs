@@ -26,8 +26,41 @@ namespace ProductFetcher
             //ProductFetcherJob j = new ProductFetcherJob();
             //j.FetchData();
 
-            ParseCompetitor();
+            //ParseCompetitor();
+
+            GenerateProductUrlMySQL();
         }
+
+        private static void GenerateProductUrlMySQL()
+        {
+            chatripEntities1 ce = new chatripEntities1();
+            string fileName = Path.Combine(Environment.CurrentDirectory, "ProductUrls.csv");
+
+            String[] values = File.ReadAllText(fileName).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            foreach (string s in values)
+            {
+                if (!string.IsNullOrEmpty(s.Trim()))
+                {
+                    string[] columns = s.Split('\t');
+
+                    store p = new store();
+                    //p.StoreChain = columns[0];
+                    p.StoreName = columns[1];
+                    //p.Category = columns[2];
+                    //p.ProductUrl = columns[3];
+                    //if (columns.Length > 4)
+                    //    p.Zipcode = columns[4];
+
+                    //p.IsActive = true;
+                    //p.HashKey = Utilities.CalculateMD5Hash(string.Concat(p.StoreChain, p.StoreName, p.Category, p.ProductUrl, p.Zipcode));
+
+                    ce.stores.Add(p);
+                    ce.SaveChanges();
+                }
+            }
+        }
+
 
         private static void ParseCompetitor()
         {
