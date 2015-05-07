@@ -45,18 +45,21 @@ namespace ProductFetcher
                     string[] columns = s.Split('\t');
 
                     store p = new store();
-                    //p.StoreChain = columns[0];
+                    p.StoreChain = columns[0];
                     p.StoreName = columns[1];
-                    //p.Category = columns[2];
-                    //p.ProductUrl = columns[3];
-                    //if (columns.Length > 4)
-                    //    p.Zipcode = columns[4];
+                    p.Category = columns[2];
+                    p.ProductUrl = columns[3];
+                    if (columns.Length > 4)
+                        p.Zipcode = columns[4];
 
                     //p.IsActive = true;
-                    //p.HashKey = Utilities.CalculateMD5Hash(string.Concat(p.StoreChain, p.StoreName, p.Category, p.ProductUrl, p.Zipcode));
+                    p.HashKey = Utilities.CalculateMD5Hash(string.Concat(p.StoreChain, p.StoreName, p.Category, p.ProductUrl, p.Zipcode));
 
-                    ce.stores.Add(p);
-                    ce.SaveChanges();
+                    if (ce.stores.Find(p.HashKey) == null)
+                    {
+                        ce.stores.Add(p);
+                        ce.SaveChanges();
+                    }
                 }
             }
         }

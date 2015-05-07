@@ -14,10 +14,8 @@ namespace ProductData
     
     public partial class store
     {
-        public long id { get; set; }
         public string StoreName { get; set; }
         public string Category { get; set; }
-        public Nullable<int> IsActive { get; set; }
         public string ProductUrl { get; set; }
         public string Zipcode { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
