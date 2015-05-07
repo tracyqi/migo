@@ -33,7 +33,7 @@ namespace ProductFetcher
 
         private static void GenerateProductUrlMySQL()
         {
-            chatripEntities1 ce = new chatripEntities1();
+            chatripEntities2 ce = new chatripEntities2();
             string fileName = Path.Combine(Environment.CurrentDirectory, "ProductUrls.csv");
 
             String[] values = File.ReadAllText(fileName).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);

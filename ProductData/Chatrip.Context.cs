@@ -13,10 +13,10 @@ namespace ProductData
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class chatripEntities1 : DbContext
+    public partial class chatripEntities2 : DbContext
     {
-        public chatripEntities1()
-            : base("name=chatripEntities1")
+        public chatripEntities2()
+            : base("name=chatripEntities2")
         {
         }
     

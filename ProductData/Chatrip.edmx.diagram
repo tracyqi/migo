@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="59aa4b925824411da03685352335023d" Name="Diagram1">
+      <Diagram DiagramId="b9f35dd489974ab181940fedb225d9dc" Name="Diagram1">
         <EntityTypeShape EntityType="chatripModel.store" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
       </Diagram>
     </edmx:Diagrams>

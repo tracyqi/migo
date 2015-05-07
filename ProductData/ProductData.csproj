@@ -87,21 +87,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="chatripData.cs" />
-    <Compile Include="ChatripEntity.Context.cs">
+    <Compile Include="Chatrip.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ChatripEntity.Context.tt</DependentUpon>
+      <DependentUpon>Chatrip.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="ChatripEntity.cs">
+    <Compile Include="Chatrip.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ChatripEntity.tt</DependentUpon>
+      <DependentUpon>Chatrip.tt</DependentUpon>
     </Compile>
-    <Compile Include="ChatripEntity.Designer.cs">
+    <Compile Include="Chatrip.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ChatripEntity.edmx</DependentUpon>
+      <DependentUpon>Chatrip.edmx</DependentUpon>
     </Compile>
     <Compile Include="ExceptionUtils.cs" />
     <Compile Include="ILogger.cs" />
@@ -110,28 +109,28 @@
     <Compile Include="DataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="store.cs">
-      <DependentUpon>ChatripEntity.tt</DependentUpon>
+      <DependentUpon>Chatrip.tt</DependentUpon>
     </Compile>
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <EntityDeploy Include="ChatripEntity.edmx">
+    <EntityDeploy Include="Chatrip.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ChatripEntity.Designer.cs</LastGenOutput>
+      <LastGenOutput>Chatrip.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="ChatripEntity.Context.tt">
+    <None Include="Chatrip.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ChatripEntity.edmx</DependentUpon>
-      <LastGenOutput>ChatripEntity.Context.cs</LastGenOutput>
+      <DependentUpon>Chatrip.edmx</DependentUpon>
+      <LastGenOutput>Chatrip.Context.cs</LastGenOutput>
     </None>
-    <None Include="ChatripEntity.edmx.diagram">
-      <DependentUpon>ChatripEntity.edmx</DependentUpon>
+    <None Include="Chatrip.edmx.diagram">
+      <DependentUpon>Chatrip.edmx</DependentUpon>
     </None>
-    <None Include="ChatripEntity.tt">
+    <None Include="Chatrip.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ChatripEntity.edmx</DependentUpon>
-      <LastGenOutput>ChatripEntity.cs</LastGenOutput>
+      <DependentUpon>Chatrip.edmx</DependentUpon>
+      <LastGenOutput>Chatrip.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
