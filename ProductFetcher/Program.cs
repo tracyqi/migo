@@ -23,12 +23,12 @@ namespace ProductFetcher
 
             //InsertDailyMetrics();
 
-            //ProductFetcherJob j = new ProductFetcherJob();
-            //j.FetchData();
+            ProductFetcherJob j = new ProductFetcherJob();
+            j.FetchData();
 
             //ParseCompetitor();
 
-            GenerateProductUrlMySQL();
+            //GenerateProductUrlMySQL();
         }
 
         private static void GenerateProductUrlMySQL()

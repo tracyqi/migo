@@ -105,6 +105,9 @@
     <Compile Include="ExceptionUtils.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="product.cs">
+      <DependentUpon>Chatrip.tt</DependentUpon>
+    </Compile>
     <Compile Include="ProductStorage.cs" />
     <Compile Include="DataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

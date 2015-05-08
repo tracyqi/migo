@@ -26,5 +26,6 @@ namespace ProductData
         }
     
         public virtual DbSet<store> stores { get; set; }
+        public virtual DbSet<product> products { get; set; }
     }
 }

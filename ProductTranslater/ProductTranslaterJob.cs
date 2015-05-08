@@ -20,6 +20,7 @@ namespace ProductTranslater
         // on an Azure Queue called queue.
         public static void ProcessQueueMessage([QueueTrigger("workerqueue")] string msg, TextWriter log)
         {
+            chatripEntities2 ce = new chatripEntities2();
             string conn = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString;
             IProductStorage productStorage_en = new ProductStorage(conn, "productsen");
              IProductStorage productStorage_ch = new ProductStorage(conn, "Products");
@@ -27,27 +28,31 @@ namespace ProductTranslater
 
             var p = (productStorage_en.GetProductByKeys(msg.Split(',')[0], msg.Split(',')[1]));
 
-            Product p_ch = new Product();
+            product p_ch = new product();
             p_ch.Category = p.Category;
             p_ch.CouponDetail = TranslateText(p.CouponDetail);
-            p_ch.CouponEndDate = p.CouponEndDate;
+            p_ch.CouponEndDate = Convert.ToDateTime(p.CouponEndDate);
             p_ch.CouponImage = p.CouponImage;
-            p_ch.CouponStartDate = p.CouponStartDate;
-            p_ch.OriginalPrice = p.OriginalPrice;
-            p_ch.PartitionKey = p.PartitionKey;
+            p_ch.CouponStartDate = Convert.ToDateTime(p.CouponStartDate);
+            p_ch.OriginalPrice = (float)(p.OriginalPrice);
             p_ch.ProductDescription = TranslateText(p.ProductDescription);
-            p_ch.ProductId = p.ProductId;
             p_ch.ProductImage = p.ProductImage;
             p_ch.ProductName = TranslateText(p.ProductName);
             p_ch.ProductSKU = p.ProductSKU;
             p_ch.ProductURL = p.ProductURL;
-            p_ch.RowKey = p.RowKey;
             p_ch.SaleCity = TranslateText(p.SaleCity);
-            p_ch.SalePrice = p.SalePrice;
+            p_ch.SalePrice = (float)p.SalePrice;
             p_ch.Store = TranslateText(p.Store);
             p_ch.StoreChain = p.StoreChain;
 
-            productStorage_ch.AddProduct(p_ch);
+            //p.IsActive = true;
+            p_ch.ProductHash = Utilities.CalculateMD5Hash(string.Concat(p_ch.Category, p_ch.CouponDetail, p_ch.CouponEndDate, p_ch.CouponStartDate, p_ch.ProductName, p_ch.ProductSKU, p_ch.SalePrice, p.SaleCity, p_ch.StoreChain));
+
+            if (ce.products.Find(p_ch.ProductHash) == null)
+            {
+                ce.products.Add(p_ch);
+                ce.SaveChanges();
+            }
         }
 
         public static string TranslateText(string input)
