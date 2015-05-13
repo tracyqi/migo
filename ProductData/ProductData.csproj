@@ -110,6 +110,9 @@
     </Compile>
     <Compile Include="ProductStorage.cs" />
     <Compile Include="DataObject.cs" />
+    <Compile Include="product_en.cs">
+      <DependentUpon>Chatrip.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="store.cs">
       <DependentUpon>Chatrip.tt</DependentUpon>

@@ -26,6 +26,28 @@
           <Property Name="Store" Type="varchar" MaxLength="50" />
           <Property Name="StoreChain" Type="varchar" MaxLength="500" />
         </EntityType>
+        <EntityType Name="product_en">
+          <Key>
+            <PropertyRef Name="ProductHash" />
+          </Key>
+          <Property Name="ProductHash" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="CouponImage" Type="varchar" MaxLength="1000" />
+          <Property Name="Category" Type="varchar" MaxLength="50" />
+          <Property Name="ProductImage" Type="varchar" MaxLength="1000" />
+          <Property Name="ProductSKU" Type="varchar" MaxLength="50" />
+          <Property Name="ProductURL" Type="varchar" MaxLength="1000" />
+          <Property Name="CouponDetail" Type="varchar" MaxLength="5000" />
+          <Property Name="CouponStartDate" Type="date" />
+          <Property Name="CouponEndDate" Type="date" />
+          <Property Name="OriginalPrice" Type="float" />
+          <Property Name="SalePrice" Type="float" />
+          <Property Name="ProductDescription" Type="varchar" MaxLength="9999" />
+          <Property Name="ProductName" Type="varchar" MaxLength="500" />
+          <Property Name="SaleCity" Type="varchar" MaxLength="50" />
+          <Property Name="Store" Type="varchar" MaxLength="50" />
+          <Property Name="StoreChain" Type="varchar" MaxLength="500" />
+          <Property Name="CreatedDate" Type="datetime" Precision="0" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
         <EntityType Name="store">
           <Key>
             <PropertyRef Name="HashKey" />
@@ -40,6 +62,7 @@
         </EntityType>
         <EntityContainer Name="chatripModelStoreContainer">
           <EntitySet Name="product" EntityType="Self.product" Schema="chatrip" store:Type="Tables" />
+          <EntitySet Name="product_en" EntityType="Self.product_en" Schema="chatrip" store:Type="Tables" />
           <EntitySet Name="store" EntityType="Self.store" Schema="chatrip" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -49,6 +72,7 @@
         <EntityContainer Name="chatripEntities2" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="stores" EntityType="chatripModel.store" />
           <EntitySet Name="products" EntityType="chatripModel.product" />
+          <EntitySet Name="product_en" EntityType="chatripModel.product_en" />
         </EntityContainer>
         <EntityType Name="store">
           <Key>
@@ -83,6 +107,28 @@
           <Property Name="Store" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="StoreChain" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="product_en">
+          <Key>
+            <PropertyRef Name="ProductHash" />
+          </Key>
+          <Property Name="ProductHash" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CouponImage" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="Category" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ProductImage" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="ProductSKU" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ProductURL" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="CouponDetail" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="CouponStartDate" Type="DateTime" />
+          <Property Name="CouponEndDate" Type="DateTime" />
+          <Property Name="OriginalPrice" Type="Single" />
+          <Property Name="SalePrice" Type="Single" />
+          <Property Name="ProductDescription" Type="String" MaxLength="9999" FixedLength="false" Unicode="false" />
+          <Property Name="ProductName" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="SaleCity" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Store" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StoreChain" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -105,6 +151,29 @@
           <EntitySetMapping Name="products">
             <EntityTypeMapping TypeName="chatripModel.product">
               <MappingFragment StoreEntitySet="product">
+                <ScalarProperty Name="StoreChain" ColumnName="StoreChain" />
+                <ScalarProperty Name="Store" ColumnName="Store" />
+                <ScalarProperty Name="SaleCity" ColumnName="SaleCity" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="ProductDescription" ColumnName="ProductDescription" />
+                <ScalarProperty Name="SalePrice" ColumnName="SalePrice" />
+                <ScalarProperty Name="OriginalPrice" ColumnName="OriginalPrice" />
+                <ScalarProperty Name="CouponEndDate" ColumnName="CouponEndDate" />
+                <ScalarProperty Name="CouponStartDate" ColumnName="CouponStartDate" />
+                <ScalarProperty Name="CouponDetail" ColumnName="CouponDetail" />
+                <ScalarProperty Name="ProductURL" ColumnName="ProductURL" />
+                <ScalarProperty Name="ProductSKU" ColumnName="ProductSKU" />
+                <ScalarProperty Name="ProductImage" ColumnName="ProductImage" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="CouponImage" ColumnName="CouponImage" />
+                <ScalarProperty Name="ProductHash" ColumnName="ProductHash" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="product_en">
+            <EntityTypeMapping TypeName="chatripModel.product_en">
+              <MappingFragment StoreEntitySet="product_en">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="StoreChain" ColumnName="StoreChain" />
                 <ScalarProperty Name="Store" ColumnName="Store" />
                 <ScalarProperty Name="SaleCity" ColumnName="SaleCity" />

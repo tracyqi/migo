@@ -28,29 +28,29 @@ namespace ProductTranslater
 
             var p = (productStorage_en.GetProductByKeys(msg.Split(',')[0], msg.Split(',')[1]));
 
-            product p_ch = new product();
+            product_en p_ch = new product_en();
             p_ch.Category = p.Category;
-            p_ch.CouponDetail = TranslateText(p.CouponDetail);
+            p_ch.CouponDetail = p.CouponDetail;// TranslateText(p.CouponDetail);
             p_ch.CouponEndDate = Convert.ToDateTime(p.CouponEndDate);
             p_ch.CouponImage = p.CouponImage;
             p_ch.CouponStartDate = Convert.ToDateTime(p.CouponStartDate);
             p_ch.OriginalPrice = (float)(p.OriginalPrice);
-            p_ch.ProductDescription = TranslateText(p.ProductDescription);
+            p_ch.ProductDescription = p.ProductDescription; // TranslateText(p.ProductDescription);
             p_ch.ProductImage = p.ProductImage;
-            p_ch.ProductName = TranslateText(p.ProductName);
+            p_ch.ProductName = p.ProductName;// TranslateText(p.ProductName);
             p_ch.ProductSKU = p.ProductSKU;
             p_ch.ProductURL = p.ProductURL;
-            p_ch.SaleCity = TranslateText(p.SaleCity);
+            p_ch.SaleCity = p.SaleCity;//TranslateText(p.SaleCity);
             p_ch.SalePrice = (float)p.SalePrice;
-            p_ch.Store = TranslateText(p.Store);
+            p_ch.Store = p.Store;// TranslateText(p.Store);
             p_ch.StoreChain = p.StoreChain;
 
             //p.IsActive = true;
             p_ch.ProductHash = Utilities.CalculateMD5Hash(string.Concat(p_ch.Category, p_ch.CouponDetail, p_ch.CouponEndDate, p_ch.CouponStartDate, p_ch.ProductName, p_ch.ProductSKU, p_ch.SalePrice, p.SaleCity, p_ch.StoreChain));
 
-            if (ce.products.Find(p_ch.ProductHash) == null)
+            if (ce.product_en.Find(p_ch.ProductHash) == null)
             {
-                ce.products.Add(p_ch);
+                ce.product_en.Add(p_ch);
                 ce.SaveChanges();
             }
         }
